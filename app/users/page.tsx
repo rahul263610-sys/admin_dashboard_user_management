@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect,useState } from "react";
+import { useDebounce } from 'use-debounce';
 import Table from "../../components/Table";
 import Link from "next/link";
 import { fetchAllUsers, deleteUser } from "@/redux/slices/userSlice";
@@ -15,21 +16,28 @@ import Pagination from "@/components/Pagination";
   const dispatch = useDispatch<AppDispatch>();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("");
+  const [debouncedSearch] = useDebounce(search, 500);
 
   const {loading, error, users,  page: currentPage = 1, limit: limitRedux = 10, totalPages = 1,}= useSelector(
     (state : RootState) => state.users
   );
 
   useEffect(() => {
-    dispatch(fetchAllUsers({ page, limit }));
-  }, [dispatch, page, limit]);
+    dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter }));
+  }, [dispatch, page, limit, search,debouncedSearch, filter]);
  
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async(id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
     try{
-      dispatch(deleteUser(id));
-      toast.success("User Deleted successfully ✅");
+      const res = await dispatch(deleteUser(id));
+      if (deleteUser.fulfilled.match(res)) {
+        toast.success("User deleted successfully");
+      } else {
+        toast.error(res.payload || "Failed to delete user");
+      }
      }catch (error: any) {
         toast.error(error);
       }
@@ -38,7 +46,28 @@ import Pagination from "@/components/Pagination";
   return (
     <div className="space-y-4">
         <div className="page-header">
+          <div className="header-left">
             <h1 className="text-2xl font-bold">Users</h1>
+              <div className="toolbar">
+                <input
+                  type="text"
+                  placeholder="Search users..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="search-input"
+                />
+
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="">All</option>
+                  <option value="admin">Admin</option>
+                  <option value="user">User</option>
+                </select>
+              </div>
+          </div>
             <Link href="/users/add" className="add-btn">
             + Add User
             </Link>
@@ -53,7 +82,7 @@ import Pagination from "@/components/Pagination";
       {!loading && !error && (
         <>
         <Table
-          columns={["id", "name", "email", "role", "Action"]}
+          columns={["id", "name", "email", "role", "status", "Action"]}
           actions={["edit", "delete"]}
           basePath="users"
           data={users}

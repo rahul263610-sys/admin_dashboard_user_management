@@ -11,12 +11,14 @@ interface Blog {
   category: string;
 }
 interface blogState{
-    blogs: Blog[];
-    loading: boolean;
-    error : string | null;
-    page: number;
+  blogs: Blog[];
+  loading: boolean;
+  error : string | null;
+  page: number;
   limit: number;
   totalPages: number;
+  search: string;
+  filter: string;
 }
 
 const initialState: blogState = {
@@ -26,6 +28,8 @@ const initialState: blogState = {
   page: 1,
   limit: 10,
   totalPages: 1,
+  search: "",
+  filter: "",
 };
 
 export const fetchAllBlogs = createAsyncThunk<
@@ -34,18 +38,20 @@ export const fetchAllBlogs = createAsyncThunk<
     page: number;
     limit: number;
     totalPages: number;
+    search: string;
+    filter: string;
   },
-  { page: number; limit: number },
+  { page: number; limit: number; search: string; filter: string; },
   { state: RootState; rejectValue: string }
 >(
   "blog/fetchAllBlogs",
-  async ({ page, limit }, { getState, rejectWithValue }) => {
+  async ({ page, limit, search, filter }, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
       if (!token) return rejectWithValue("No authentication token");
 
       const res = await axios.get(
-        `${BACKEND_URL}/blogs/getAllBlogs?page=${page}&limit=${limit}`,
+        `${BACKEND_URL}/api/blogs/?page=${page}&limit=${limit}&search=${search}&filter=${filter}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,6 +65,8 @@ export const fetchAllBlogs = createAsyncThunk<
         page: res.data.pagination.currentPage,
         limit: res.data.pagination.limit,
         totalPages: res.data.pagination.totalPages,
+        search, 
+        filter,
       };
     } catch (error: any) {
       return rejectWithValue(
@@ -78,7 +86,7 @@ export const addBlog= createAsyncThunk(
         try{
             const state = getState() as RootState;
             const token = state.auth.token;
-            const res = await axios.post(`${BACKEND_URL}/blogs/add`, payload,
+            const res = await axios.post(`${BACKEND_URL}/api/blogs`, payload,
                  {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -103,7 +111,7 @@ export const deleteBlog = createAsyncThunk<
   try {
     const token = getState().auth.token;
 
-    await axios.delete(`${BACKEND_URL}/blogs/delete/${blogId}`, {
+    await axios.delete(`${BACKEND_URL}/api/blogs/${blogId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -124,7 +132,7 @@ export const fetchBlogById = createAsyncThunk<
     const token = getState().auth.token;
     if (!token) return rejectWithValue("No token");
 
-    const res = await axios.get(`${BACKEND_URL}/blogs/getBlog/${id}`, {
+    const res = await axios.get(`${BACKEND_URL}/api/blogs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -144,8 +152,8 @@ export const updateBlog = createAsyncThunk<
   try {
     const token = getState().auth.token;
 
-    const res = await axios.put(
-      `${BACKEND_URL}/blogs/update/${payload.blogId}`,
+    const res = await axios.patch(
+      `${BACKEND_URL}/api/blogs/${payload.blogId}`,
       payload,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -174,6 +182,8 @@ const blogSlice = createSlice({
           state.page = action.payload.page;
           state.limit = action.payload.limit;
           state.totalPages = action.payload.totalPages;
+          state.search = action.payload.search;
+          state.filter = action.payload.filter;
         })
         .addCase(fetchAllBlogs.rejected, (state, action) => {
             state.loading = false;

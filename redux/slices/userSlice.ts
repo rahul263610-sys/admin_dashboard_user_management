@@ -20,6 +20,8 @@ interface UserState {
   page: number;
   limit: number;
   totalPages: number;
+   search: string;
+  filter: string;
 }
 
 const initialState: UserState = {
@@ -30,6 +32,9 @@ const initialState: UserState = {
   page: 1,
   limit: 10,
   totalPages: 1,
+  search: "",
+  filter: "",
+
 };
 
 /* ================= FETCH ALL USERS ================= */
@@ -39,23 +44,27 @@ export const fetchAllUsers = createAsyncThunk<
   page: number;
   limit: number;
   totalPages: number;
+  search: string;
+  filter: string;
 },
- { page: number; limit: number },
+ { page: number; limit: number;search: string; filter: string; },
   { state: RootState; rejectValue: string }
->("user/fetchAllUsers", async ( { page, limit }, { getState, rejectWithValue }) => {
+>("user/fetchAllUsers", async ( { page, limit, search, filter }, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
     if (!token) return rejectWithValue("No authentication token");
 
-    const res = await axios.get(`${BACKEND_URL}/users?page=${page}&limit=${limit}`, {
+    const res = await axios.get(`${BACKEND_URL}/api/users/profiles?page=${page}&limit=${limit}&search=${search}&filter=${filter}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-   return {
+    return {
       users: res.data.data, 
       page: res.data.pagination.currentPage,
       limit: res.data.pagination.limit,
       totalPages: res.data.pagination.totalPages,
+      search, 
+      filter,
     };
 
   } catch (error: any) {
@@ -75,7 +84,7 @@ export const addUser = createAsyncThunk<
     const token = getState().auth.token;
 
     const res = await axios.post(
-      `${BACKEND_URL}/users/register`,
+      `${BACKEND_URL}/api/auth/register`,
       payload,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -93,12 +102,12 @@ export const fetchUserById = createAsyncThunk<
   User,
   string,
   { state: RootState; rejectValue: string }
->("user/fetchByEmail", async (id, { getState, rejectWithValue }) => {
+>("user/fetchById", async (id, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
     if (!token) return rejectWithValue("No token");
 
-    const res = await axios.get(`${BACKEND_URL}/users/${id}`, {
+    const res = await axios.get(`${BACKEND_URL}/api/users/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -120,7 +129,7 @@ export const updateUser = createAsyncThunk<
     const token = getState().auth.token;
 
     const res = await axios.put(
-      `${BACKEND_URL}/users/updateprofile/${payload.userId}`,
+      `${BACKEND_URL}/api/users/${payload.userId}`,
       payload,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -142,7 +151,7 @@ export const deleteUser = createAsyncThunk<
   try {
     const token = getState().auth.token;
 
-    await axios.delete(`${BACKEND_URL}/users/deleteuser/${userId}`, {
+    await axios.delete(`${BACKEND_URL}/api/users/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -172,6 +181,8 @@ const userSlice = createSlice({
           state.page = action.payload.page;
           state.limit = action.payload.limit;
           state.totalPages = action.payload.totalPages;
+          state.search = action.payload.search;
+          state.filter= action.payload.filter;
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loading = false;

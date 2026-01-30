@@ -49,7 +49,10 @@ export default function Table({ columns, actions=[], basePath, data, onDelete }:
                       }
                     </div>
                   ) : (
-                    col ==='id' ? i + 1 : row[col] 
+                    (col ==='id' ) ? i + 1 
+                    : col === 'status' ? row.status == 1 ? "Active" : "Inactive" 
+                    : col =='created By' ? row.user?.name || "N/A" 
+                    : row[col]
                   )}
                 </td>
               ))}

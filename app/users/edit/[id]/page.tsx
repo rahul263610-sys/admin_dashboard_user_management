@@ -100,7 +100,7 @@ export default function EditUserPage() {
           placeholder="Enter email"
           required
           onChange={(e) => setEmail(e.target.value)}
-          />
+        />
 
         {/* Password */}
         <FormInput

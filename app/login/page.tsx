@@ -29,7 +29,7 @@ export default function AddUserPage() {
       const res = await dispatch(loginUser({ email, password })).unwrap();
       if (res.success) {
         toast.success("Logged in successfully ✅");
-        router.replace("/");
+        router.replace("/dashboard");
       }
     } catch (err: any) {
       toast.error(

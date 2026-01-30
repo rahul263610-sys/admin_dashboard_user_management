@@ -3,8 +3,17 @@ import axios from "axios";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+}
+
 interface AuthState {
   userId: string | null;
+  user: User | null;
   token: string | null;
   loading: boolean;
   error: string | null;
@@ -14,6 +23,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   userId: null,
+  user: null,
   token: null,
   loading: false,
   error: null,
@@ -32,7 +42,7 @@ export const loginUser = createAsyncThunk(
   ) => {
     try {
       const res = await axios.post(
-        `${BACKEND_URL}/users/Login`,
+        `${BACKEND_URL}/api/auth/login`,
         payload
       );
 
@@ -44,6 +54,58 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+export const myProfile = createAsyncThunk(
+  "auth/myprofile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `${BACKEND_URL}/api/users/myprofile`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch profile"
+      );
+    }
+  }
+);
+
+export const updateMyProfile = createAsyncThunk<
+  { user: User },              
+  { name: string; email: string },    
+  { rejectValue: string }
+>(
+  "auth/updateMyProfile",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.put(
+        `${BACKEND_URL}/api/users/myprofile/update`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update profile"
+      );
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: "auth",
@@ -57,11 +119,13 @@ const authSlice = createSlice({
 
       localStorage.removeItem("userId");
       localStorage.removeItem("token");
+      localStorage.removeItem("username");
     },
 
     loadUserFromStorage: (state) => {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
 
       if (userId && token) {
         state.userId = userId;
@@ -90,12 +154,38 @@ const authSlice = createSlice({
         // ✅ Persist login
         localStorage.setItem("userId", action.payload.id);
         localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("username", action.payload.name);
       })
 
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      });
+      })
+       .addCase(myProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(myProfile.fulfilled, (state, action) => {
+          state.loading = false;
+          state.user = action.payload.user;
+      })
+      .addCase(myProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateMyProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMyProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+      })
+      .addCase(updateMyProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
   },
 });
 

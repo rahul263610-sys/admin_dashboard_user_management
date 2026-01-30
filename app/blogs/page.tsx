@@ -14,18 +14,25 @@ function BlogsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("");
   const {loading, error, blogs, page: currentPage = 1, limit: limitRedux = 10, totalPages = 1,}= useSelector(
     (state : RootState) => state.blogs
   );
 
    useEffect(() => {
-     dispatch(fetchAllBlogs({ page, limit }));
-   }, [dispatch, page, limit]);
-    const handleDelete = (id: string) => {
+     dispatch(fetchAllBlogs({ page, limit, search, filter }));
+   }, [dispatch, page, limit, search, filter]);
+
+    const handleDelete = async  (id: string) => {
       if (confirm("Are you sure you want to delete this blog ?")) {
       try{
-        dispatch(deleteBlog(id));
-        toast.success("Blog Deleted successfully");
+        const res= await dispatch(deleteBlog(id));
+        if (deleteBlog.fulfilled.match(res)) {
+          toast.success("Blog deleted successfully");
+        } else {
+          toast.error(res.payload || "Failed to delete blog");
+        }
       }
       catch(err :any){
           toast.error(err)
@@ -34,19 +41,50 @@ function BlogsPage() {
     };
   return (
     <div className="space-y-4">
-        <div className="page-header">
-            <h1 className="text-2xl font-bold">Blogs</h1>
-            <Link href="/blogs/add" className="add-btn">
-            + Add Blog
-            </Link>
+     <div className="page-header">
+      <div className="header-left">
+        <h1 className="page-title">Blogs</h1>
+
+        <div className="toolbar">
+          <input
+            type="text"
+            placeholder="Search blogs..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-input"
+          />
+
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">All Categories</option>
+            <option value="tech">Tech</option>
+            <option value="lifestyle">Life Style</option>
+            <option value="education">Education</option>
+            <option value="business">Business</option>
+            <option value="philosophy">Philosophy</option>
+          </select>
         </div>
-        {loading && <Loader />}
+      </div>
+      <Link href="/blogs/add" className="add-btn">
+        + Add Blog
+      </Link>
+    </div>
+   {loading && <Loader />}
         {!loading && error && (
           <div className="error text-red-500">{error}</div>
         )}
        {!loading && !error && (
         <>
-        <Table columns={["id", "title", "content","category", "Action"]} actions={["edit", "delete"]} basePath="blogs" data={blogs} onDelete={handleDelete} />
+        <Table 
+          columns={["id", "title", "content","category", "created By", "Action"]} 
+          actions={["edit", "delete"]} 
+          basePath="blogs" 
+          data={blogs} 
+          onDelete={handleDelete} 
+        />
         <Pagination
           page={page}
           totalPages={totalPages}
