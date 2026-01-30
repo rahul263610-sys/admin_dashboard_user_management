@@ -14,10 +14,6 @@ interface TableProps {
 
 export default function Table({ columns, actions=[], basePath, data, onDelete }: TableProps) {
 
-  const handleDelete = (id: string) => {
-    console.log("Delete user:", id);
-  };
-
   return (
     <div className="table-container">
       <table>
@@ -53,7 +49,7 @@ export default function Table({ columns, actions=[], basePath, data, onDelete }:
                       }
                     </div>
                   ) : (
-                    col ==='id' ? i + 1 : row[col]
+                    col ==='id' ? i + 1 : row[col] 
                   )}
                 </td>
               ))}

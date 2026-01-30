@@ -17,6 +17,9 @@ interface UserState {
   loading: boolean;
   success: boolean;
   error: string | null;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 const initialState: UserState = {
@@ -24,23 +27,37 @@ const initialState: UserState = {
   loading: false,
   success:false,
   error: null,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
 };
 
 /* ================= FETCH ALL USERS ================= */
 export const fetchAllUsers = createAsyncThunk<
-  User[],
-  void,
+{
+  users: User[];
+  page: number;
+  limit: number;
+  totalPages: number;
+},
+ { page: number; limit: number },
   { state: RootState; rejectValue: string }
->("user/fetchAllUsers", async (_, { getState, rejectWithValue }) => {
+>("user/fetchAllUsers", async ( { page, limit }, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
     if (!token) return rejectWithValue("No authentication token");
 
-    const res = await axios.get(`${BACKEND_URL}/users`, {
+    const res = await axios.get(`${BACKEND_URL}/users?page=${page}&limit=${limit}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    return res.data.usser; 
+   return {
+      users: res.data.data, 
+      page: res.data.pagination.currentPage,
+      limit: res.data.pagination.limit,
+      totalPages: res.data.pagination.totalPages,
+    };
+
   } catch (error: any) {
     return rejectWithValue(
       error.response?.data?.message || "Failed to fetch users"
@@ -150,8 +167,11 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
-        state.loading = false;
-        state.users = action.payload;
+          state.loading = false;
+          state.users = action.payload.users;
+          state.page = action.payload.page;
+          state.limit = action.payload.limit;
+          state.totalPages = action.payload.totalPages;
       })
       .addCase(fetchAllUsers.rejected, (state, action) => {
         state.loading = false;

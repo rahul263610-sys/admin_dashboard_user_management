@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import Table from "../../components/Table";
 import Link from "next/link";
 import { fetchAllUsers, deleteUser } from "@/redux/slices/userSlice";
@@ -8,19 +8,22 @@ import { RootState, AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
+import Pagination from "@/components/Pagination";
 
 
  function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const {loading, error, users}= useSelector(
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const {loading, error, users,  page: currentPage = 1, limit: limitRedux = 10, totalPages = 1,}= useSelector(
     (state : RootState) => state.users
   );
-  const getAllUsers = ()=>{
-    dispatch(fetchAllUsers());
-  }
-  useEffect(()=>{
-    getAllUsers();
-  }, [])
+
+  useEffect(() => {
+    dispatch(fetchAllUsers({ page, limit }));
+  }, [dispatch, page, limit]);
+ 
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this user?")) {
@@ -48,6 +51,7 @@ import { toast } from "react-toastify";
       )}
 
       {!loading && !error && (
+        <>
         <Table
           columns={["id", "name", "email", "role", "Action"]}
           actions={["edit", "delete"]}
@@ -55,6 +59,14 @@ import { toast } from "react-toastify";
           data={users}
           onDelete={handleDelete}
         />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          limit={limit}
+          setPage={setPage}
+          setLimit={setLimit}
+        />
+      </>
       )}
       </div>
   );

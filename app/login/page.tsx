@@ -19,7 +19,7 @@ export default function AddUserPage() {
 
    useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [isAuthenticated, router]);
 

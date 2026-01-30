@@ -37,6 +37,18 @@ export default function ClientLayout({
       router.replace("/login");
     }
   }, [authLoaded, isAuthenticated, pathname, router]);
+  
+  // ✅ Detect mobile screen
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize(); // initial run
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // ⛔ Block rendering until auth is checked
   if (!authLoaded) return null;

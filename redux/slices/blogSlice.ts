@@ -13,43 +13,61 @@ interface Blog {
 interface blogState{
     blogs: Blog[];
     loading: boolean;
-    error : string | null,
+    error : string | null;
+    page: number;
+  limit: number;
+  totalPages: number;
 }
 
 const initialState: blogState = {
   blogs : [],
   loading: false,
   error: null,
+  page: 1,
+  limit: 10,
+  totalPages: 1,
 };
 
 export const fetchAllBlogs = createAsyncThunk<
-  Blog[],
-  void,
-  { state: RootState }
->( "blog/fetchAllBlogs",
-    async (_, { getState, rejectWithValue }) => {
-        try{
-            const token = getState().auth.token;
-            if (!token) {
-                return rejectWithValue("No authentication token");
-            }
-            const res = await axios.get(`${BACKEND_URL}/blogs/getAllBlogs`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            )
-            return res.data.data;
+  {
+    blogs: Blog[];
+    page: number;
+    limit: number;
+    totalPages: number;
+  },
+  { page: number; limit: number },
+  { state: RootState; rejectValue: string }
+>(
+  "blog/fetchAllBlogs",
+  async ({ page, limit }, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      if (!token) return rejectWithValue("No authentication token");
+
+      const res = await axios.get(
+        `${BACKEND_URL}/blogs/getAllBlogs?page=${page}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-        catch (error: any) {
-            return rejectWithValue(
-                 error.response?.data?.message || "Failed to fetch blogs"
-            );
-        }
+      );
+
+       return {
+        blogs: res.data.data, 
+        page: res.data.pagination.currentPage,
+        limit: res.data.pagination.limit,
+        totalPages: res.data.pagination.totalPages,
+      };
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch blogs"
+      );
     }
-)
+  }
+);
+
 
 export const addBlog= createAsyncThunk(
     "blog/add",
@@ -151,8 +169,11 @@ const blogSlice = createSlice({
             state.error = null;
         })
         .addCase(fetchAllBlogs.fulfilled, (state, action) => {
-            state.loading = false;
-            state.blogs = action.payload;
+         state.loading = false;
+          state.blogs = action.payload.blogs;
+          state.page = action.payload.page;
+          state.limit = action.payload.limit;
+          state.totalPages = action.payload.totalPages;
         })
         .addCase(fetchAllBlogs.rejected, (state, action) => {
             state.loading = false;

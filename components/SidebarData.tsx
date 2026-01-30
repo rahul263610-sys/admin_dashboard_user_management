@@ -3,7 +3,7 @@ import { FaHome, FaUser, FaBlog  } from "react-icons/fa";
 export const SidebarData = [
   {
     title: "Dashboard",
-    path: "/",
+    path: "/dashboard",
     icon: <FaHome />,
     cName: "nav-text",
   },
