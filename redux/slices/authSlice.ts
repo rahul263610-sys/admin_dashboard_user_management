@@ -106,6 +106,33 @@ export const updateMyProfile = createAsyncThunk<
   }
 );
 
+export const changePassword = createAsyncThunk<
+  { message: string },          // return type
+  { oldpassword: string; newpassword: string },
+  { rejectValue: string }
+>(
+  "auth/changePassword",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `${BACKEND_URL}/api/users/update/password/myprofile`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return res.data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to change password"
+      );
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -185,6 +212,17 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
 
   },
 });
