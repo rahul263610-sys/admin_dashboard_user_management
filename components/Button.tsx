@@ -7,11 +7,11 @@ interface ButtonProps {
   icon?: ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
-  variant?: "edit" | "delete";
+  variant?: "edit" | "delete" | "view";
   className?: string;
 }
 
-export default function Button({ text, icon, onClick,  type = "button",  variant = "edit", className=""  }: ButtonProps) {
+export default function Button({ text, icon, onClick, type = "button", variant = "edit", className = "" }: ButtonProps) {
   const base =
     "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition shadow focus:outline-none focus:ring-2";
 
@@ -20,7 +20,7 @@ export default function Button({ text, icon, onClick,  type = "button",  variant
     delete: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
   };
   return (
-    <button onClick={onClick} type={type} className={className? className : `btn ${variant === "edit" ? "btn-edit" : "btn-delete"}`}>
+    <button onClick={onClick} type={type} className={className ? className : `btn ${variant === "edit" ? "btn-edit" : variant ==="delete" ? "btn-delete" : "btn-view"}`}>
       {icon}
       {text && <span>{text}</span>}
     </button>

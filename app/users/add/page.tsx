@@ -16,6 +16,7 @@ export default function AddUserPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
+  const [contactNumber, setContactNumber] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("1");
   const [error, setError] = useState();
@@ -23,7 +24,7 @@ export default function AddUserPage() {
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     try{ 
-      const res= await dispatch(addUser({name, email, role, password, status}));
+      const res= await dispatch(addUser({name, email, role, password, status, contactNumber}));
       console.log(res)
       if(res.payload.success){
         toast.success("User Added successfully ✅");
@@ -58,6 +59,13 @@ export default function AddUserPage() {
           onChange={(e) => setEmail(e.target.value)}
         />
         <FormInput
+          label="Contact Number"
+          value={contactNumber}
+          placeholder="Enter Contact Number"
+          required
+          onChange={(e) => setContactNumber(e.target.value)}
+        />
+        <FormInput
           label="Password"
           type="password"
           value={password}
@@ -65,7 +73,6 @@ export default function AddUserPage() {
           required
           onChange={(e) => setPassword(e.target.value)}
         />
-
         <div>
           <label>Role</label>
           <select value={role} onChange={(e) => setRole(e.target.value)}>

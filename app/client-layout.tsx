@@ -21,8 +21,26 @@ export default function ClientLayout({
     (state: RootState) => state.auth
   );
 
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+
+  // Detect mobile screen on mount
+  useEffect(() => {
+    const mobile = typeof window !== "undefined" && window.innerWidth <= 962;
+    setIsMobile(mobile);
+    setIsSidebarExpanded(!mobile); 
+  }, []);
+
+  // Optional: update on resize
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 962;
+      setIsMobile(mobile);
+      if (!mobile) setIsSidebarExpanded(true);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // ✅ Load auth once
   useEffect(() => {
@@ -37,18 +55,6 @@ export default function ClientLayout({
       router.replace("/login");
     }
   }, [authLoaded, isAuthenticated, pathname, router]);
-  
-  // ✅ Detect mobile screen
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 962);
-    };
-
-    handleResize(); // initial run
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   // ⛔ Block rendering until auth is checked
   if (!authLoaded) return null;
@@ -65,13 +71,12 @@ export default function ClientLayout({
 
   return (
     <>
-      <Navbar isSidebarExpanded={isSidebarExpanded} />
-
       <Header
         isSidebarExpanded={isSidebarExpanded}
         toggleSidebar={() => setIsSidebarExpanded((p) => !p)}
+        isMobile={isMobile}
       />
-
+      <Navbar isSidebarExpanded={isSidebarExpanded} setIsSidebarExpanded={setIsSidebarExpanded} isMobile={isMobile} />
       <main
         style={{
           marginTop: "72px",

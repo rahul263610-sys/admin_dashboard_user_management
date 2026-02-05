@@ -1,26 +1,58 @@
 "use client"; 
+import { useState, useEffect } from "react";
 import "../styles/table.css";
 import Link from "next/link";
 import Button from "./Button";
-import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiEye  } from "react-icons/fi";
+import { Modal, Button as BootstrapButton } from "react-bootstrap";
+import { User } from "./types/user";
+
 
 interface TableProps {
   columns: string[];
+  modal_header: string[];
   data: any[];
-  actions?: ("edit" | "delete")[];
+  actions?: ("edit" | "delete" | "view")[];
   basePath: string;
+  modal_title: string;
   onDelete?: (id: string) => void;
 }
 
-export default function Table({ columns, actions=[], basePath, data, onDelete }: TableProps) {
+export default function Table({ columns, actions=[], basePath, data, onDelete, modal_header=[], modal_title="" }: TableProps) {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
+
+  const handleOpen = (user: User) => {
+    setSelectedUser(user);
+    setShowModal(true);
+  };
+
+  const handleClose = () => {
+    setSelectedUser(null);
+    setShowModal(false);
+  };
+
+  const getValue = (data: User, col: string, i: number=0) => {
+    switch (col) {
+      case "srno":
+        return i + 1 ;
+      case "status":
+        return data.status === "1" ? "Active" : "Inactive";
+      case "created By":
+        return data.user?.name || "N/A";
+      default:
+        return (data as Record<string, any>)[col] || "N/A";
+    }
+  };
   return (
+    <>
     <div className="table-container">
       <table>
         <thead>
           <tr>
             {columns.map((col) => (
-              <th key={col}>
+              <th key={col} data-column={col}>
                 {col.charAt(0).toUpperCase() + col.slice(1)}
               </th>
             ))}
@@ -30,30 +62,28 @@ export default function Table({ columns, actions=[], basePath, data, onDelete }:
           {data.length >0 ? data.map((row, i) => (
             <tr key={i}>
               {columns.map((col) => (
-                <td key={col}>
+                <td key={col}  data-column={col}>
                   {col === "Action" ? (
                     <div className="action-buttons">
+                      {actions.includes("view") && (
+                        <Button icon={<FiEye size={16} />} variant="view" onClick={() => handleOpen(row)} />
+                      )}
+                      
                       { actions.includes("edit") && <Link href={`/${basePath}/edit/${row._id}`}>
-                          <Button
-                            icon={<FiEdit2 size={16} />}
-                            variant="edit"
-                            />
+                        <Button
+                          icon={<FiEdit2 size={16} />}
+                          variant="edit"
+                          />
                         </Link>
                       }
-
                       { actions.includes("delete") && <Button
                           icon={<FiTrash2 size={16} />}
                           variant="delete"
                           onClick={() => onDelete?.(row._id)}
-                        />
-                      }
+                          />
+                        }
                     </div>
-                  ) : (
-                    (col ==='id' ) ? i + 1 
-                    : col === 'status' ? row.status == 1 ? "Active" : "Inactive" 
-                    : col =='created By' ? row.user?.name || "N/A" 
-                    : row[col]
-                  )}
+                  ) : (getValue(row, col, i))}
                 </td>
               ))}
             </tr>
@@ -65,5 +95,26 @@ export default function Table({ columns, actions=[], basePath, data, onDelete }:
         </tbody>
       </table>
     </div>
+    <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{modal_title} Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            {selectedUser && (
+              <div className="d-flex flex-column gap-2">
+                {modal_header.map((col) => (
+                  <div key={col}>
+                    <strong>{col.charAt(0).toUpperCase() + col.slice(1)}:</strong>{" "}
+                    {getValue(selectedUser, col)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </Modal.Body>
+
+        <Modal.Footer>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 }

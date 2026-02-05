@@ -10,19 +10,21 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
 import Pagination from "@/components/Pagination";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 
  function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("");
-  const [debouncedSearch] = useDebounce(search, 500);
-
+  // const [search, setSearch] = useState("");
+  // const [filter, setFilter] = useState("");
+  
   const {loading, error, users,  page: currentPage = 1, limit: limitRedux = 10, totalPages = 1,}= useSelector(
     (state : RootState) => state.users
   );
+  const {search, filter} = useSelector((state : RootState)=> state.search);
+  const [debouncedSearch] = useDebounce(search, 500);
 
   useEffect(() => {
     dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter }));
@@ -38,43 +40,26 @@ import Pagination from "@/components/Pagination";
       } else {
         toast.error(res.payload || "Failed to delete user");
       }
-     }catch (error: any) {
-        toast.error(error);
-      }
+    }catch (error: any) {
+      toast.error(error);
+    }
   }
   };
   return (
+    <>
+    <Breadcrumb pageName="Users" /> 
     <div className="space-y-4">
         <div className="page-header">
-          <div className="header-left">
+          {/* <div className="header-left">
             <h1 className="text-2xl font-bold">Users</h1>
-              <div className="toolbar">
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="search-input"
-                />
-
-                <select
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">All</option>
-                  <option value="admin">Admin</option>
-                  <option value="user">User</option>
-                </select>
-              </div>
-          </div>
+            </div>
             <Link href="/users/add" className="add-btn">
             + Add User
-            </Link>
-        </div>
+            </Link> */}
+           </div>
       {loading && <Loader />}
       {!loading && error && (
-        <div className="text-red-500">
+        <div className="error-box">
           {typeof error === "string" ? error : "Something went wrong"}
         </div>
       )}
@@ -82,22 +67,26 @@ import Pagination from "@/components/Pagination";
       {!loading && !error && (
         <>
         <Table
-          columns={["id", "name", "email", "role", "status", "Action"]}
-          actions={["edit", "delete"]}
+          columns={["srno", "name", "email","contactNumber", "role", "status", "Action"]}
+          modal_title="User"
+          modal_header={[ "name", "email","contactNumber", "bio", "role", "status"]}
+          actions={["edit", "delete", "view"]}
           basePath="users"
           data={users}
           onDelete={handleDelete}
-        />
+          />
         <Pagination
           page={page}
           totalPages={totalPages}
           limit={limit}
           setPage={setPage}
           setLimit={setLimit}
-        />
+          />
       </>
       )}
-      </div>
+    </div>
+    </>
+    
   );
 }
 

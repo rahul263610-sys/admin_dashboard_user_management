@@ -22,7 +22,7 @@
   text-align: left;
   padding: 12px 16px;
   font-weight: 600;
-  color: #111827; /* Dark color for better visibility */
+  color: #111827;
   border-bottom: 2px solid #e5e7eb;
 }
 
@@ -36,10 +36,57 @@
 
 .table-container td {
   padding: 12px 16px;
-  color: #111827; /* Dark color for better visibility */
+  color: #111827;
   border-bottom: 1px solid #e5e7eb;
 }
 
 .table-container tbody tr:last-child td {
   border-bottom: none;
+}
+
+@media (max-width: 768px) {
+   .table-container {
+    overflow-x: hidden;
+    padding: 8px; 
+  }
+
+  .table-container table {
+    width: 100%; 
+    table-layout: auto;
+  }
+
+  .table-container th,
+  .table-container td {
+    padding: 6px 8px;  
+    font-size: 14px;
+    word-break: break-word;
+  }
+
+  .table-container th,
+  .table-container td {
+    display: none;
+  }
+
+ .table-container .action-buttons {
+    display: flex;
+    flex-direction: column;  
+     justify-content: flex-start;
+      gap: 6px;  
+    align-items: flex-start;
+  }
+  .table-container th[data-column="name"],
+  .table-container td[data-column="name"],
+  .table-container th[data-column="email"],
+  .table-container td[data-column="email"],
+  .table-container th[data-column="title"],
+  .table-container td[data-column="title"],
+  .table-container th[data-column="content"],
+  .table-container td[data-column="content"],
+  .table-container th[data-column="Action"],
+  .table-container td[data-column="Action"] {
+    display: table-cell;
+  }
+  .table-container .action-buttons {
+    gap: 6px;
+  }
 }

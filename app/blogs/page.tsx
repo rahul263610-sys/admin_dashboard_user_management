@@ -9,17 +9,16 @@ import { RootState, AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "@/components/Loader";
 import Pagination from "@/components/Pagination";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 
 function BlogsPage() {
   const dispatch = useDispatch<AppDispatch>();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("");
   const {loading, error, blogs, page: currentPage = 1, limit: limitRedux = 10, totalPages = 1,}= useSelector(
     (state : RootState) => state.blogs
   );
-
+  const{search, filter}= useSelector((state: RootState) => state.search)
    useEffect(() => {
      dispatch(fetchAllBlogs({ page, limit, search, filter }));
    }, [dispatch, page, limit, search, filter]);
@@ -40,61 +39,43 @@ function BlogsPage() {
       }
     };
   return (
+    <>
+    <Breadcrumb pageName="Blogs"/>
     <div className="space-y-4">
-     <div className="page-header">
-      <div className="header-left">
-        <h1 className="page-title">Blogs</h1>
-
-        <div className="toolbar">
-          <input
-            type="text"
-            placeholder="Search blogs..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-input"
-          />
-
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">All Categories</option>
-            <option value="tech">Tech</option>
-            <option value="lifestyle">Life Style</option>
-            <option value="education">Education</option>
-            <option value="business">Business</option>
-            <option value="philosophy">Philosophy</option>
-          </select>
-        </div>
+      <div className="page-header">
+        {/* <div className="header-left">
+          <h1 className="page-title">Blogs</h1>
+          </div> */}
+        {/* <Link href="/blogs/add" className="add-btn">
+          + Add Blog
+        </Link> */}
       </div>
-      <Link href="/blogs/add" className="add-btn">
-        + Add Blog
-      </Link>
-    </div>
-   {loading && <Loader />}
+       {loading && <Loader />}
         {!loading && error && (
           <div className="error text-red-500">{error}</div>
         )}
        {!loading && !error && (
-        <>
+         <>
         <Table 
-          columns={["id", "title", "content","category", "created By", "Action"]} 
-          actions={["edit", "delete"]} 
+          columns={["srno", "title", "content","category", "created By", "Action"]} 
+          modal_title="Blog"
+          modal_header={["title", "content","category", "created By"]} 
+          actions={["edit", "delete", "view"]} 
           basePath="blogs" 
           data={blogs} 
           onDelete={handleDelete} 
-        />
+          />
         <Pagination
           page={page}
           totalPages={totalPages}
           limit={limit}
           setPage={setPage}
           setLimit={setLimit}
-        />
+          />
         </>
        )}
     </div>
+    </>
   );
 }
 

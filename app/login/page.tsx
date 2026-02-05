@@ -40,44 +40,60 @@ export default function AddUserPage() {
 
 
   return (
-    <div className="add-form-container">
-      <h1>Login</h1>     
-      <form onSubmit={handleSubmit}>
-        <FormInput
-          label="Email"
-          type="email"
-          value={email}
-          placeholder="Enter email address"
-          required
-          onChange={(e) => setEmail(e.target.value)}
+  <div className="login-page">
+    <div className="login-container">
+
+      {/* Left Panel */}
+      <div className="login-left">
+        <img
+          src="/images/logo/logo-icon.svg"
+          alt="Logo"
+          className="login-logo"
         />
-        <FormInput
-          label="Password"
-          type="password"
-          value={password}
-          placeholder="Enter Password"
-          required
-          onChange={(e) => setPassword(e.target.value)}
+        <p className="login-subtitle">
+          Welcome back! Login to manage your dashboard and users.
+        </p>
+        <img
+          src="/images/logo/login_template_front.png"
+          alt="Illustration"
+          className="login-illustration"
         />
-        <div className="add-form-buttons">
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "10px",
-              borderRadius: "6px",
-              backgroundColor: loading ? "#94a3b8" : "#4f46e5",
-              color: "#fff",
-              fontWeight: "600",
-              border: "none",
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
-            {loading ? "Logging in..." : "Login"}
+      </div>
+
+      {/* Right Panel */}
+      <div className="login-right">
+        <h2 className="login-title">Sign in to your account</h2>
+        <p className="login-desc">Enter your credentials below</p>
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <button type="submit" className="login-button">
+            Login
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
+
     </div>
-  );
+  </div>
+);
+
 }

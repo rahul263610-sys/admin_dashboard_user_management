@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { RootState } from "../store";
+import { User } from "@/components/types/user";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-}
+// interface User {
+//   _id: string;
+//   name: string;
+//   email: string;
+//   about : string;
+//   role: string;
+//   status: string;
+// }
 
 interface UserState {
   users: User[];
@@ -37,7 +39,7 @@ const initialState: UserState = {
 
 };
 
-/* ================= FETCH ALL USERS ================= */
+
 export const fetchAllUsers = createAsyncThunk<
 {
   users: User[];
@@ -74,10 +76,10 @@ export const fetchAllUsers = createAsyncThunk<
   }
 });
 
-/* ================= ADD USER ================= */
+
 export const addUser = createAsyncThunk<
   any,
-  { name: string; email: string; role: string; password: string; status: string },
+  { name: string; email: string; role: string; password: string; status: string, contactNumber:string, },
   { state: RootState; rejectValue: string }
 >("user/add", async (payload, { getState, rejectWithValue }) => {
   try {
@@ -97,7 +99,7 @@ export const addUser = createAsyncThunk<
   }
 });
 
-/* ================= FETCH USER ================= */
+
 export const fetchUserById = createAsyncThunk<
   User,
   string,
@@ -119,16 +121,16 @@ export const fetchUserById = createAsyncThunk<
   }
 });
 
-/* ================= UPDATE USER ================= */
+
 export const updateUser = createAsyncThunk<
   any,
-  { userId: string; name: string; email: string; role: string; password: string; status: string },
+  { userId: string; name: string; email: string; role: string; password: string; status: string, contactNumber: string },
   { state: RootState; rejectValue: string }
 >("user/update", async (payload, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
 
-    const res = await axios.put(
+    const res = await axios.patch(
       `${BACKEND_URL}/api/users/${payload.userId}`,
       payload,
       { headers: { Authorization: `Bearer ${token}` } }
@@ -142,7 +144,6 @@ export const updateUser = createAsyncThunk<
   }
 });
 
-/* ================= DELETE USER ================= */
 export const deleteUser = createAsyncThunk<
   string,
   string,
@@ -150,8 +151,8 @@ export const deleteUser = createAsyncThunk<
 >("user/delete", async (userId, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
-
-    await axios.delete(`${BACKEND_URL}/api/users/${userId}`, {
+    console.log("token", token)
+    await axios.patch(`${BACKEND_URL}/api/admin/delete/${userId}`, {},{
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -163,7 +164,7 @@ export const deleteUser = createAsyncThunk<
   }
 });
 
-/* ================= SLICE ================= */
+
 const userSlice = createSlice({
   name: "users",
   initialState,

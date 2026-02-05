@@ -9,6 +9,7 @@ import { fetchUserById, updateUser } from "@/redux/slices/userSlice";
 import type { AppDispatch } from "@/redux/store";
 import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
+import { Breadcrumb } from "react-bootstrap";
 
 export default function EditUserPage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function EditUserPage() {
   const [name, setName] = useState("");
   const [userId, setUserId] = useState("");
   const [email, setEmail] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("User");
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,7 @@ export default function EditUserPage() {
         setUserId(user._id)
         setName(user.name || "");
         setEmail(user.email || "");
+        setContactNumber(user.contactNumber || "");
         setRole(user.role || "user");
         setStatus(user.status);
         setLoading(false);
@@ -67,6 +70,7 @@ export default function EditUserPage() {
           role,
           password,
           status,
+          contactNumber
         })
       ).unwrap();
       if(res.success){
@@ -81,11 +85,12 @@ export default function EditUserPage() {
   };
 
   return (
+    <>
+    {/* <Breadcrumb pageName="EditUser"/> */}
     <div className="add-form-container">
       <h1>Edit User</h1>
       {loading ? <Loader /> : (
-      <form onSubmit={handleSubmit}>
-        {/* Name */}
+        <form onSubmit={handleSubmit}>
         <FormInput
           label="Name"
           value={name}
@@ -93,16 +98,20 @@ export default function EditUserPage() {
           required
           onChange={(e) => setName(e.target.value)}
           />
-        {/* Email */}
         <FormInput
           label="Email"
           value={email}
           placeholder="Enter email"
           required
           onChange={(e) => setEmail(e.target.value)}
+          />
+         <FormInput
+          label="Contact Number"
+          value={contactNumber}
+          placeholder="Enter Contact Number"
+          required
+          onChange={(e) => setContactNumber(e.target.value)}
         />
-
-        {/* Password */}
         <FormInput
           label="Password"
           type="password"
@@ -110,8 +119,6 @@ export default function EditUserPage() {
           placeholder="Enter new password"
           onChange={(e) => setPassword(e.target.value)}
           />
-
-        {/* Role */}
         <div>
           <label>Role</label>
           <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -126,10 +133,8 @@ export default function EditUserPage() {
             <option value="0">Inactive</option>
           </select>
         </div>
-        {/* Error */}
         {formError && <p className="formError">{formError}</p>}
 
-        {/* Buttons */}
         <div className="add-form-buttons">
           <Button
             text="Cancel"
@@ -142,5 +147,6 @@ export default function EditUserPage() {
       </form>
       )}
     </div>
+  </>
   );
 }

@@ -10,7 +10,7 @@
   color: #333;
   user-select: none;
 }
-/* Previous / Next buttons */
+
 .pagination button {
   background-color: #1E3A8A;
   border: none;
@@ -33,7 +33,6 @@
   background-color: #1E3A8A;
 }
 
-/* Page X of Y text */
 .pagination span {
   flex-grow: 0;
   white-space: nowrap;
@@ -42,13 +41,11 @@
   margin-right: 6px;
 }
 
-/* Page numbers container */
 .page-numbers {
   display: flex;
   gap: 4px;
 }
 
-/* Page number buttons */
 .page-numbers button {
   background-color: #e9ecef;
   border: 1px solid #ccc;
@@ -63,6 +60,7 @@
 
 .page-numbers button:hover {
   background-color: #d6d8db;
+   color: white;
 }
 
 .page-numbers button.active {
@@ -71,7 +69,6 @@
   border-color: #1E3A8A;
 }
 
-/* Page size select */
 .pagination select {
   padding: 5px 8px;
   border-radius: 4px;
@@ -87,4 +84,35 @@
 .pagination select:focus {
   border-color: #1E3A8A;
   outline: none;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    gap: 4px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow-x: auto;
+  }
+
+  .pagination button {
+    padding: 4px 8px;
+    min-width: 50px;
+    font-size: 12px;
+  }
+
+  .page-numbers button {
+    padding: 3px 6px;
+    min-width: 28px;
+    font-size: 12px;
+  }
+
+  .pagination span {
+    font-size: 12px;
+  }
+
+  .pagination select {
+    padding: 3px 6px;
+    font-size: 12px;
+    min-width: 50px;
+  }
 }

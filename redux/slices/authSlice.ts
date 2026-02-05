@@ -1,15 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
+import { User } from "../../components/types/user";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-}
+// interface User {
+//   _id: string;
+//   name: string;
+//   email: string;
+//   role: string;
+//   bio: string;
+//   phone: string;
+//   status: string;
+// }
 
 interface AuthState {
   userId: string | null;
@@ -46,7 +48,7 @@ export const loginUser = createAsyncThunk(
         payload
       );
 
-      return res.data; // <-- full response
+      return res.data;
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || "Login failed"
@@ -87,7 +89,7 @@ export const updateMyProfile = createAsyncThunk<
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.put(
+      const res = await axios.patch(
         `${BACKEND_URL}/api/users/myprofile/update`,
         payload,
         {
@@ -105,6 +107,35 @@ export const updateMyProfile = createAsyncThunk<
     }
   }
 );
+export const updateMyProfileImage = createAsyncThunk<
+  { success: boolean; message: string; data: User },
+  FormData,
+  { rejectValue: string }
+>(
+  "auth/updateMyProfileImage",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.patch(
+        `${BACKEND_URL}/api/users/myprofile/update/myprofile/image`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update profile image"
+      );
+    }
+  }
+);
+
 
 export const changePassword = createAsyncThunk<
   { message: string },          // return type
@@ -134,6 +165,35 @@ export const changePassword = createAsyncThunk<
   }
 );
 
+export const deleteMyProfileImage = createAsyncThunk<
+  { success: boolean; message: string; data: User },
+  void,
+  { rejectValue: string }
+>(
+  "auth/deleteMyProfileImage",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.delete(
+        `${BACKEND_URL}/api/users/myprofile/delete/myprofile/image`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete profile image"
+      );
+    }
+  }
+);
+
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -146,13 +206,11 @@ const authSlice = createSlice({
 
       localStorage.removeItem("userId");
       localStorage.removeItem("token");
-      localStorage.removeItem("username");
     },
 
     loadUserFromStorage: (state) => {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
-      const username = localStorage.getItem("username");
 
       if (userId && token) {
         state.userId = userId;
@@ -178,10 +236,8 @@ const authSlice = createSlice({
         state.userId = action.payload.id;
         state.token = action.payload.token;
 
-        // ✅ Persist login
         localStorage.setItem("userId", action.payload.id);
         localStorage.setItem("token", action.payload.token);
-        localStorage.setItem("username", action.payload.name);
       })
 
       .addCase(loginUser.rejected, (state, action) => {
@@ -222,10 +278,39 @@ const authSlice = createSlice({
       .addCase(changePassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      });
+      })
+      .addCase(updateMyProfileImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMyProfileImage.fulfilled, (state, action) => {
+        state.loading = false;
 
-  },
-});
+        if (action.payload.success) {
+          state.user = action.payload.data;
+        }
+      })
+      .addCase(updateMyProfileImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(deleteMyProfileImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteMyProfileImage.fulfilled, (state, action) => {
+        state.loading = false;
+
+        if (action.payload.success) {
+          state.user = action.payload.data;
+        }
+      })
+      .addCase(deleteMyProfileImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+    },
+  });
 
 export const { logout, loadUserFromStorage } = authSlice.actions;
 export default authSlice.reducer;
