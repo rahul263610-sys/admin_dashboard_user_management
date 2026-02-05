@@ -48,7 +48,7 @@ export default function MyProfile() {
           <h4>Personal Information</h4>
 
           <div className="info-row">
-            <span className="info-label">Full Name</span>
+            <span className="info-label">Name</span>
             <span className="info-value">{user?.name}</span>
           </div>
 

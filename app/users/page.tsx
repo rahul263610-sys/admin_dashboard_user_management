@@ -49,14 +49,6 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
     <>
     <Breadcrumb pageName="Users" /> 
     <div className="space-y-4">
-        <div className="page-header">
-          {/* <div className="header-left">
-            <h1 className="text-2xl font-bold">Users</h1>
-            </div>
-            <Link href="/users/add" className="add-btn">
-            + Add User
-            </Link> */}
-           </div>
       {loading && <Loader />}
       {!loading && error && (
         <div className="error-box">

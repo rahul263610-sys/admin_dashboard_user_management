@@ -42,14 +42,6 @@ function BlogsPage() {
     <>
     <Breadcrumb pageName="Blogs"/>
     <div className="space-y-4">
-      <div className="page-header">
-        {/* <div className="header-left">
-          <h1 className="page-title">Blogs</h1>
-          </div> */}
-        {/* <Link href="/blogs/add" className="add-btn">
-          + Add Blog
-        </Link> */}
-      </div>
        {loading && <Loader />}
         {!loading && error && (
           <div className="error text-red-500">{error}</div>

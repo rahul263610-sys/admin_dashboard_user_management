@@ -6,6 +6,8 @@ import Button from "./Button";
 import { FiEdit2, FiTrash2, FiEye  } from "react-icons/fi";
 import { Modal, Button as BootstrapButton } from "react-bootstrap";
 import { User } from "./types/user";
+import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
 
 
 interface TableProps {
@@ -22,6 +24,7 @@ export default function Table({ columns, actions=[], basePath, data, onDelete, m
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  const {user, loading, error} = useSelector((state :  RootState)=> state.auth)
 
   const handleOpen = (user: User) => {
     setSelectedUser(user);
@@ -68,20 +71,20 @@ export default function Table({ columns, actions=[], basePath, data, onDelete, m
                       {actions.includes("view") && (
                         <Button icon={<FiEye size={16} />} variant="view" onClick={() => handleOpen(row)} />
                       )}
-                      
-                      { actions.includes("edit") && <Link href={`/${basePath}/edit/${row._id}`}>
+                      {(user?.role==="admin" || user?._id ===row?.user?._id ) && actions.includes("edit") && <Link href={`/${basePath}/edit/${row._id}`}>
                         <Button
                           icon={<FiEdit2 size={16} />}
                           variant="edit"
                           />
                         </Link>
                       }
-                      { actions.includes("delete") && <Button
+                      {(user?.role==="admin" || user?._id ===row?.user?._id ) && actions.includes("delete") && <Button
                           icon={<FiTrash2 size={16} />}
                           variant="delete"
                           onClick={() => onDelete?.(row._id)}
                           />
                         }
+                  
                     </div>
                   ) : (getValue(row, col, i))}
                 </td>

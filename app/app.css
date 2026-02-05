@@ -123,14 +123,6 @@
 .login-button:active {
   transform: translateY(0);
 }
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
 .error-box {
   margin: 40px auto;
   max-width: 500px;
