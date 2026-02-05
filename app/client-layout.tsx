@@ -79,7 +79,7 @@ export default function ClientLayout({
       <Navbar isSidebarExpanded={isSidebarExpanded} setIsSidebarExpanded={setIsSidebarExpanded} isMobile={isMobile} />
       <main
         style={{
-          marginTop: "72px",
+          marginTop: "55px",
           marginLeft: sidebarWidth,
           padding: "20px",
         }}

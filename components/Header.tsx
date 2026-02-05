@@ -87,7 +87,7 @@ interface HeaderProps {
                     onChange={(e) => dispatch(setFilter(e.target.value))}
                     className="filter-select"
                   >
-                    <option value="">All Roles</option>
+                    <option value="">All</option>
                     <option value="admin">Admin</option>
                     <option value="user">User</option>
                   </select>

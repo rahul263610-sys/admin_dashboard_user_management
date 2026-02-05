@@ -128,19 +128,22 @@ const [selectedFile, setSelectedFile] = useState<File | null>(null);
   };
 
   const handleDeleteProfileImage = async()=>{
-    try {
-    const res = await dispatch(deleteMyProfileImage()).unwrap();
+    if (confirm("Are you sure you want to delete profile image ?")) {
+      try {
+      const res = await dispatch(deleteMyProfileImage()).unwrap();
 
-    if (res.success) {
-      toast.success(res.message || "Profile photo deleted");
+      if (res.success) {
+        toast.success(res.message || "Profile photo deleted");
 
-      // Remove preview instantly
-      setPreviewImage(null);
-      setSelectedFile(null);
+        // Remove preview instantly
+        dispatch(myProfile());
+        setPreviewImage(null);
+        setSelectedFile(null);
+      }
+      } catch (err: any) {
+        toast.error(err);
+      }
     }
-  } catch (err: any) {
-    toast.error(err);
-  }
   }
 
   if (loading || !user) return <Loader />;

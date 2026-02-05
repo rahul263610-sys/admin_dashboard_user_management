@@ -14,7 +14,9 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/redux/slices/authSlice";
 import type { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
-import {AiOutlineClose  } from "react-icons/ai";
+import {AiOutlineClose,  } from "react-icons/ai";
+import { FaHome, FaUser, FaBlog, FaChevronDown } from "react-icons/fa";
+
 
 interface NavbarProps {
   isSidebarExpanded: boolean;
@@ -27,6 +29,15 @@ export default function Navbar({ isSidebarExpanded, setIsSidebarExpanded, isMobi
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const [openMenus, setOpenMenus] = React.useState<{ [key: string]: boolean }>({});
+
+  const toggleSubmenu = (title: string) => {
+  setOpenMenus((prev) => ({
+    ...prev,
+    [title]: !prev[title],
+  }));
+};
+
 
   const handleLogout = () => {
     dispatch(logout());    
@@ -84,23 +95,70 @@ export default function Navbar({ isSidebarExpanded, setIsSidebarExpanded, isMobi
       <div className="sidebar-scroll">
         <p className="sidebar-section-title">MENU</p>
 
-        <ul className="nav-menu-items">
-          {SidebarData.map((item, index) => {
-            const isActive = pathname === item.path;
-            return (
+     <ul className="nav-menu-items">
+        {SidebarData.map((item, index) => {
+          const isParentExactActive = pathname === item.path;
+          const isChildActive = item.children?.some((child) => pathname === child.path);
+          const isActive = isParentExactActive || isChildActive;
+
+          const hasChildren = item.children && item.children.length > 0;
+          const isOpen = openMenus[item.title] ?? isChildActive;
+
+          return (
               <li
                 key={index}
-                className={`nav-text ${isActive ? "active" : ""}`}
-                onClick={handleLinkClick}
+                className={`nav-text 
+                  ${isParentExactActive ? "active-parent" : ""} 
+                  ${isChildActive ? "active-child-parent" : ""}
+                `}
               >
-                <Link href={item.path}>
-                  <span className="icon">{item.icon}</span>
-                  {isSidebarExpanded && <span className="label">{item.title}</span>}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+                <div className="menu-parent"> 
+                  <Link
+                    href={item.path}
+                    className="menu-link"
+                    onClick={(e) => {
+                      if (hasChildren) {
+                        e.preventDefault(); // stop navigation
+                        toggleSubmenu(item.title); // ONLY toggle
+                      } else {
+                        handleLinkClick();
+                      }
+                    }}
+                  >
+                    <span className="icon">{item.icon}</span>
+                    {isSidebarExpanded && <span className="label">{item.title}</span>}
+                  {hasChildren && isSidebarExpanded && (
+                    <FaChevronDown
+                      className={`submenu-arrow ${isOpen ? "rotate" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        toggleSubmenu(item.title);
+                      }}
+                    />
+                  )}
+                  </Link>
+
+                </div>
+
+                {hasChildren && isOpen && isSidebarExpanded && (
+                  <ul className="submenu">
+                    {item.children.map((sub, i) => {
+                      const isSubActive = pathname === sub.path;
+                      return (
+                        <li key={i} className={`submenu-item ${isSubActive ? "active" : ""}`}>
+                          <Link href={sub.path} onClick={handleLinkClick}>
+                            {sub.title}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+            </li>
+          );
+        })}
+      </ul>
       </div>
 
       <button className="lgoutbtn" onClick={handleLogout}>

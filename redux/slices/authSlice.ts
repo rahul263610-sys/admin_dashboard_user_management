@@ -300,10 +300,6 @@ const authSlice = createSlice({
       })
       .addCase(deleteMyProfileImage.fulfilled, (state, action) => {
         state.loading = false;
-
-        if (action.payload.success) {
-          state.user = action.payload.data;
-        }
       })
       .addCase(deleteMyProfileImage.rejected, (state, action) => {
         state.loading = false;
