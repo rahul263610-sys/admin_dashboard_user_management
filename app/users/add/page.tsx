@@ -92,9 +92,8 @@ export default function AddUserPage() {
             text="Cancel"
             variant="delete"
             onClick={() => router.push("/users")}
-            className="cancel-btn"
           />
-          <Button text="Add User" type="submit" className="submit-btn" />
+          <Button text="Add User" type="submit" />
         </div>
       </form>
     </div>

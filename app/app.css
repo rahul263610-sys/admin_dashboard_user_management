@@ -1,3 +1,256 @@
+/* DarkMode */
+/* ================= DARK MODE BASE ================= */
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* ================= MAIN CONTENT ================= */
+.dark .app-main {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* All divs, sections, containers inside main */
+.dark .app-main div,
+.dark .app-main section,
+.dark .app-main article {
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Cards / Panels / Boxes */
+.dark .app-main .card,
+.dark .app-main .box,
+.dark .app-main .container,
+.dark .app-main .content-wrapper,
+.dark .app-main .table-wrapper {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+}
+
+/* ================= HEADER ================= */
+
+/* ================= HEADER DARK MODE ================= */
+
+/* Header background */
+.dark .topbar {
+  background-color: #0f172a;
+  border-bottom: 1px solid #1e293b;
+}
+
+/* Search input */
+.dark .topbar .search-input {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+
+.dark .topbar .search-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Filter select dropdown */
+.dark .topbar .filter-select {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+
+/* Dropdown options */
+.dark .topbar .filter-select option {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* Toggle sidebar button (☰ icon) */
+.dark .topbar .toggle-button {
+  color: #ffffff;
+}
+
+.dark .topbar .toggle-button:hover {
+  background-color: #1e293b;
+  border-radius: 6px;
+}
+
+/* Admin name text */
+.dark .topbar .admin-name {
+  color: #e2e8f0;
+}
+
+/* Admin avatar icon color */
+.dark .topbar .admin-avatar {
+  color: #e2e8f0;
+}
+
+
+.dark .admin-dropdown {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+}
+
+.dark .dropdown-link {
+  color: #e2e8f0;
+}
+/* ===== FIX WHITE HOVER IN DARK MODE DROPDOWN ===== */
+
+.dark .admin-dropdown .dropdown-link:hover,
+.dark .admin-dropdown .logout-btn:hover {
+  background-color: #243047 !important;  /* dark hover */
+  color: #ffffff !important;
+}
+
+/* Also fix button-style logout if present */
+.dark .admin-dropdown button.dropdown-link {
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+/* Remove any default light hover coming from global a:hover */
+.dark .admin-dropdown a:hover {
+  background-color: #243047 !important;
+  color: #ffffff !important;
+}
+
+/* ================= TABLES ================= */
+.dark .app-main table {
+  background-color: #1e293b;
+  color: #e2e8f0;
+}
+
+.dark .app-main thead {
+  background-color: #0f172a;
+}
+
+.dark .app-main thead tr {
+  border-bottom: 1px solid #334155;
+}
+.dark .app-main tbody tr {
+  border-bottom: 1px solid #334155;
+}
+
+.dark .app-main tbody tr:hover {
+  background-color: #243047;
+}
+/* ================= TABLE HEADER DARK FIX ================= */
+.dark .app-main table thead {
+  background-color: #0f172a !important;
+}
+
+.dark .app-main table thead th {
+  background-color: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+/* ================= FORMS ================= */
+.dark .app-main input,
+.dark .app-main textarea,
+.dark .app-main select {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+}
+
+.dark .app-main input::placeholder,
+.dark .app-main textarea::placeholder {
+  color: #94a3b8;
+}
+
+.dark .app-main label {
+  color: #cbd5e1;
+}
+
+/* ================= TEXT ================= */
+.dark .app-main h1,
+.dark .app-main h2,
+.dark .app-main h3,
+.dark .app-main h4,
+.dark .app-main h5,
+.dark .app-main h6,
+.dark .app-main p,
+.dark .app-main span,
+.dark .app-main td,
+.dark .app-main th {
+  color: #e2e8f0;
+}
+
+/* ================= BORDERS ================= */
+.dark .app-main hr {
+  border-color: #334155;
+}
+
+/* ================= DARK MODE BUTTONS ================= */
+
+/* Default button */
+.dark .app-main button {
+  background-color: #334155;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+}
+
+/* Hover */
+.dark .app-main button:hover {
+  background-color: #475569;
+}
+
+/* VIEW (Blue) */
+.dark .app-main .btn-view {
+  background-color: #1d4ed8;
+  border-color: #1e40af;
+  color: #ffffff;
+}
+
+.dark .app-main .btn-view:hover {
+  background-color: #2563eb;
+}
+
+/* EDIT (Green) */
+.dark .app-main .btn-edit {
+  background-color: #047857;
+  border-color: #065f46;
+  color: #ffffff;
+}
+
+.dark .app-main .btn-edit:hover {
+  background-color: #059669;
+}
+
+/* DELETE (Red) */
+.dark .app-main .btn-delete {
+  background-color: #b91c1c;
+  border-color: #7f1d1d;
+  color: #ffffff;
+}
+.dark .app-main .status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.dark .app-main .status-inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.dark .app-main .btn-delete:hover {
+  background-color: #dc2626;
+}
+
+.dark .status-badge.active {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.dark .status-badge.inactive {
+  background: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+/* ================= DO NOT TOUCH BUTTONS ================= */
+/* Buttons intentionally not styled so they remain same in both modes */
+
 /* ===== Page Layout ===== */
 .login-page {
   min-height: 100vh;

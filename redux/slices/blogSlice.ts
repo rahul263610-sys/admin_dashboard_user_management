@@ -111,7 +111,7 @@ export const deleteBlog = createAsyncThunk<
   try {
     const token = getState().auth.token;
 
-    await axios.delete(`${BACKEND_URL}/api/blogs/${blogId}`, {
+    await axios.patch(`${BACKEND_URL}/api/blogs/delete/${blogId}`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

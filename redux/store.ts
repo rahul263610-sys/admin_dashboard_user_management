@@ -3,6 +3,7 @@ import authReducer from "./slices/authSlice";
 import userReducer from "./slices/userSlice";
 import blogReducer from "./slices/blogSlice";
 import searchReducer from "./slices/searchSlice";
+import themeReducer from "./slices/themeSlice";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     users: userReducer,
     blogs: blogReducer,
     search: searchReducer,
+    theme: themeReducer,
 
   },
 });

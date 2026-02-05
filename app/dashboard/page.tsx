@@ -142,14 +142,12 @@ if (error)
 
             <div
               className={`status-badge ${
-                user.isDeleted
-                  ? "deleted"
-                  : user.status === "1" || user.status === `"1"`
+                user.status === "1"
                   ? "active"
                   : "inactive"
               }`}
             >
-              {user.isDeleted ? "Deleted" : user.status === "1" || user.status === `"1"` ? "Active" : "Inactive"}
+              { user.status === "1" ? "Active" : "Inactive"}
             </div>
 
             <div className="date-cell">

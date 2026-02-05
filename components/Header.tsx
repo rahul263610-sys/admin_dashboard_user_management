@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { setSearch,  setFilter, resetSearch } from "@/redux/slices/searchSlice";
 import { usePathname } from "next/navigation";
 import { searchConfig } from "@/app/helper/searchConfig";
+import DarkModeSwitcher from "./DarkModeSwitcher";
 
 interface HeaderProps {
   isSidebarExpanded: boolean;
@@ -112,6 +113,7 @@ interface HeaderProps {
           </div>
         </div>
         <div className="topbar-right" ref={dropdownRef}>
+           <DarkModeSwitcher />
           <div
             className="admin-info"
             onClick={() => setOpen((prev) => !prev)}

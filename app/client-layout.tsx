@@ -20,7 +20,7 @@ export default function ClientLayout({
   const { isAuthenticated, authLoaded } = useSelector(
     (state: RootState) => state.auth
   );
-
+  const {mode}= useSelector((state : RootState) => state.theme);
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
@@ -30,6 +30,10 @@ export default function ClientLayout({
     setIsMobile(mobile);
     setIsSidebarExpanded(!mobile); 
   }, []);
+
+  useEffect(()=>{
+    document.documentElement.classList.toggle("dark", mode==="dark");
+  }, [mode])
 
   // Optional: update on resize
   useEffect(() => {
@@ -78,6 +82,7 @@ export default function ClientLayout({
       />
       <Navbar isSidebarExpanded={isSidebarExpanded} setIsSidebarExpanded={setIsSidebarExpanded} isMobile={isMobile} />
       <main
+           className="app-main"
         style={{
           marginTop: "55px",
           marginLeft: sidebarWidth,

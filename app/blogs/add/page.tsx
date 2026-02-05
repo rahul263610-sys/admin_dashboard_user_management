@@ -65,9 +65,8 @@ export default function AddBlogPage() {
             text="Cancel"
             variant="delete"
             onClick={() => router.push("/blogs")}
-            className="cancel-btn"
           />
-          <Button text="Add Blog" type="submit" className="submit-btn" />
+          <Button text="Add Blog" type="submit" />
         </div>
       </form>
     </div>
