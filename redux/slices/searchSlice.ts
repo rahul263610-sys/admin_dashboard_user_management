@@ -3,7 +3,8 @@ import { SearchState } from "@/components/types/search";
 
 const initialState : SearchState = {
     search : "",
-    filter: ""
+    filter: "",
+    isDeleted: true,
 }
 
 const searchSlice = createSlice({
@@ -16,12 +17,16 @@ const searchSlice = createSlice({
     setFilter: (state, action: PayloadAction<string>) => {
       state.filter = action.payload;
     },
+    setIsDeleted: (state, action: PayloadAction<boolean>) => {
+      state.isDeleted = action.payload;
+    },
     resetSearch: (state) => {
       state.search = "";
       state.filter = "";
+      state.isDeleted = false;
     },
   },
 });
 
-export const { setSearch, setFilter, resetSearch } = searchSlice.actions;
+export const { setSearch, setFilter, resetSearch, setIsDeleted } = searchSlice.actions;
 export default searchSlice.reducer;

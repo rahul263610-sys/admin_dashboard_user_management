@@ -720,6 +720,11 @@
   gap: 12px;
   margin-bottom: 30px;
 }
+.breadcrumb-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
 .breadcrumb-title {
   font-size: 26px;
@@ -758,6 +763,39 @@
   font-weight: 600;
 }
 
+.filter-select {
+  padding: 8px 12px;
+  padding-right: 36px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  background-color: #f9fafb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* remove default browser styles */
+  outline: none !important;
+  box-shadow: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* custom arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+/* remove black border on focus & click */
+.filter-select:focus,
+.filter-select:focus-visible,
+.filter-select:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: #2563eb;
+  background-color: #ffffff;
+}
 
 /* setting page  */
 .settings-container {

@@ -11,6 +11,7 @@ import { User } from "../../components/types/user";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { getUserRole } from "@/auth/getUserRole";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -33,6 +34,7 @@ interface DashboardResponse {
 }
 
 export default function DashboardPage() {
+  const role = getUserRole();
   const router = useRouter();
   const [stats, setStats] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,6 +44,9 @@ export default function DashboardPage() {
   if(!authLoaded){return <Loader />}
   
   useEffect(() => {
+    if(role!=="admin"){
+      router.replace("/blogs");
+    }
     const token = localStorage.getItem("token");
     if(!token && !authLoaded) return;
 

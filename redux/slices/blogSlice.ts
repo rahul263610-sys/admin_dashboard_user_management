@@ -41,17 +41,17 @@ export const fetchAllBlogs = createAsyncThunk<
     search: string;
     filter: string;
   },
-  { page: number; limit: number; search: string; filter: string; },
+  { page: number; limit: number; search: string; filter: string; isDeleted: boolean },
   { state: RootState; rejectValue: string }
 >(
   "blog/fetchAllBlogs",
-  async ({ page, limit, search, filter }, { getState, rejectWithValue }) => {
+  async ({ page, limit, search, filter, isDeleted }, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
       if (!token) return rejectWithValue("No authentication token");
 
       const res = await axios.get(
-        `${BACKEND_URL}/api/blogs/?page=${page}&limit=${limit}&search=${search}&filter=${filter}`,
+        `${BACKEND_URL}/api/blogs/?page=${page}&limit=${limit}&search=${search}&filter=${filter}&isDeleted=${isDeleted}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -166,6 +166,32 @@ export const updateBlog = createAsyncThunk<
   }
 });
 
+export const bulkDeleteBlogs = createAsyncThunk<
+string[], 
+string[], 
+{state : RootState , rejectvalue : string}
+>("user/deleteMany", async(ids, {getState, rejectWithValue })=>{
+    try{
+        const token = getState().auth.token;
+        if(!token){
+          return rejectWithValue("No authorization token ");
+        }
+          await axios.patch(`${BACKEND_URL}/api/admin/delete/blogs`,{ids},
+            {
+              headers : {
+                Authorization : `Bearer ${token}`,
+                "Content-Type" : "application/json",
+              }
+            }
+          )
+          return ids;
+    }
+    catch(error : any){
+        return(error.response?.data?.message || "failed to delete blogs"); 
+    }
+})
+
+
 const blogSlice = createSlice({
     name: "blogs",
     initialState,
@@ -219,6 +245,18 @@ const blogSlice = createSlice({
                 _id: updated.blogId,
                 };
             }
+        })
+        .addCase(bulkDeleteBlogs.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(bulkDeleteBlogs.fulfilled, (state, action)=>{
+          state.loading=false;
+          state.blogs= state.blogs.filter((blog)=> !action.payload.includes(blog._id));
+        })
+        .addCase(bulkDeleteBlogs.rejected, (state, action)=>{
+          state.loading= false;
+          state.error = action.payload as string;
         })
     }
 })

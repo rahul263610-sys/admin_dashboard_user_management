@@ -22,8 +22,9 @@ interface UserState {
   page: number;
   limit: number;
   totalPages: number;
-   search: string;
+  search: string;
   filter: string;
+  isDeleted: boolean;
 }
 
 const initialState: UserState = {
@@ -36,7 +37,7 @@ const initialState: UserState = {
   totalPages: 1,
   search: "",
   filter: "",
-
+  isDeleted: true,
 };
 
 
@@ -49,14 +50,14 @@ export const fetchAllUsers = createAsyncThunk<
   search: string;
   filter: string;
 },
- { page: number; limit: number;search: string; filter: string; },
+ { page: number; limit: number;search: string; filter: string; isDeleted: boolean},
   { state: RootState; rejectValue: string }
->("user/fetchAllUsers", async ( { page, limit, search, filter }, { getState, rejectWithValue }) => {
+>("user/fetchAllUsers", async ( { page, limit, search, filter, isDeleted }, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
     if (!token) return rejectWithValue("No authentication token");
 
-    const res = await axios.get(`${BACKEND_URL}/api/users/profiles?page=${page}&limit=${limit}&search=${search}&filter=${filter}`, {
+    const res = await axios.get(`${BACKEND_URL}/api/users/profiles?page=${page}&limit=${limit}&search=${search}&filter=${filter}&isDeleted=${isDeleted}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -151,7 +152,6 @@ export const deleteUser = createAsyncThunk<
 >("user/delete", async (userId, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
-    console.log("token", token)
     await axios.patch(`${BACKEND_URL}/api/admin/delete/${userId}`, {},{
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -164,6 +164,30 @@ export const deleteUser = createAsyncThunk<
   }
 });
 
+export const bulkDeleteUsers = createAsyncThunk<
+string[], 
+string[], 
+{state : RootState , rejectvalue : string}
+>("user/deleteMany", async(ids, {getState, rejectWithValue })=>{
+    try{
+        const token = getState().auth.token;
+        if(!token){
+          return rejectWithValue("No authorization token ");
+        }
+          await axios.patch(`${BACKEND_URL}/api/admin/delete/many`,{ids},
+            {
+              headers : {
+                Authorization : `Bearer ${token}`,
+                "Content-Type" : "application/json",
+              }
+            }
+          )
+          return ids;
+    }
+    catch(error : any){
+        return(error.response?.data?.message || "failed to delete users"); 
+    }
+})
 
 const userSlice = createSlice({
   name: "users",
@@ -233,7 +257,19 @@ const userSlice = createSlice({
       })
       .addCase(deleteUser.rejected, (state, action) => {
         state.error = action.payload ?? "Failed to delete user";
-      });
+      })
+      .addCase(bulkDeleteUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(bulkDeleteUsers.fulfilled, (state, action)=>{
+        state.loading=false;
+        state.users= state.users.filter((user)=> !action.payload.includes(user._id));
+      })
+      .addCase(bulkDeleteUsers.rejected, (state, action)=>{
+        state.loading= false;
+        state.error = action.payload as string;
+      })
   },
 });
 

@@ -10,10 +10,11 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { myProfile, logout } from "@/redux/slices/authSlice";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { setSearch,  setFilter, resetSearch } from "@/redux/slices/searchSlice";
+import { setSearch,  setFilter, resetSearch, setIsDeleted } from "@/redux/slices/searchSlice";
 import { usePathname } from "next/navigation";
 import { searchConfig } from "@/app/helper/searchConfig";
 import DarkModeSwitcher from "./DarkModeSwitcher";
+import { getUserRole } from "@/auth/getUserRole";
 
 interface HeaderProps {
   isSidebarExpanded: boolean;
@@ -23,9 +24,10 @@ interface HeaderProps {
  function Header({ isSidebarExpanded, toggleSidebar, isMobile }: HeaderProps) {
   const pathname = usePathname();
   const router= useRouter();
+  const role= getUserRole();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { search, filter} = useSelector ((state: RootState)=> state.search);
+  const { search, filter, isDeleted} = useSelector ((state: RootState)=> state.search);
 
   useEffect(() => {
     dispatch(resetSearch());
@@ -54,9 +56,7 @@ interface HeaderProps {
     router.replace("/login");
   };
 
-  const activeSearch = Object.keys(searchConfig).find((key) =>
-    pathname.includes(key)
-  );
+  const activeSearch = Object.keys(searchConfig).find((key) => pathname === `/${key}`);
 
   return (
     <header className={`topbar ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
@@ -93,6 +93,16 @@ interface HeaderProps {
                     <option value="user">User</option>
                   </select>
                 )}
+                {searchConfig[activeSearch].filterType === "users" && (
+                  <select
+                     value={String(isDeleted)}
+                    onChange={(e) => dispatch(setIsDeleted(e.target.value === "true"))}
+                    className="filter-select"
+                  >
+                    <option value="false">Users</option>
+                    <option value="true">Deleted Users</option>
+                  </select>
+                )}
 
                 {searchConfig[activeSearch].filterType === "blogs" && (
                   <select
@@ -106,6 +116,16 @@ interface HeaderProps {
                     <option value="education">Education</option>
                     <option value="business">Business</option>
                     <option value="philosophy">Philosophy</option>
+                  </select>
+                )}
+                {searchConfig[activeSearch].filterType === "blogs" && role==="admin" && (
+                  <select
+                     value={String(isDeleted)}
+                    onChange={(e) => dispatch(dispatch(setIsDeleted(e.target.value === "true")))}
+                    className="filter-select"
+                  >
+                    <option value="false">Blogs</option>
+                    <option value="true">Deleted blogs</option>
                   </select>
                 )}
               </div>

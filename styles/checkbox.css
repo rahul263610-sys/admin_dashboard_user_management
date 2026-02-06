@@ -1,0 +1,33 @@
+.checkbox-wrapper {
+  display: inline-flex;
+  cursor: pointer;
+  align-items: center;
+}
+
+.checkbox-wrapper input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #3056d3;
+  border-radius: 4px;
+  position: relative;
+}
+
+.checkbox-wrapper input:checked + .checkbox-custom {
+  background-color: #3056d3;
+}
+
+.checkbox-wrapper input:checked + .checkbox-custom::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}

@@ -4,14 +4,13 @@ import { useEffect,useState } from "react";
 import { useDebounce } from 'use-debounce';
 import Table from "../../components/Table";
 import Link from "next/link";
-import { fetchAllUsers, deleteUser } from "@/redux/slices/userSlice";
+import { fetchAllUsers, deleteUser, bulkDeleteUsers } from "@/redux/slices/userSlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "@/components/Loader";
 import { toast } from "react-toastify";
 import Pagination from "@/components/Pagination";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-
 
  function UsersPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,19 +21,21 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
     (state : RootState) => state.users
   );
   const {token , authLoaded} = useSelector((state : RootState)=> state.auth);
-  const {search, filter} = useSelector((state : RootState)=> state.search);
+  const {search, filter, isDeleted} = useSelector((state : RootState)=> state.search);
   const [debouncedSearch] = useDebounce(search, 500);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const showBulkActions = selectedIds.length > 0;
 
   if (!authLoaded) {
     return <Loader />;
   }
 
   useEffect(() => {
-    if(!token && !authLoaded){
+    if(!token || !authLoaded){
       return 
     }
-    dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter }));
-  }, [dispatch, page, limit, search,debouncedSearch, filter]);
+    dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter, isDeleted }));
+  }, [dispatch, page, limit, search,debouncedSearch, filter, isDeleted]);
  
 
   const handleDelete = async(id: string) => {
@@ -51,9 +52,32 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
     }
   }
   };
+
+  const handleBulkDelete = async()=>{
+    if (selectedIds.length===0) return;
+    if(!confirm(`Are you sure you want to delete ${selectedIds.length} users ?`)){
+      return;
+    }
+    try{
+        const res = await dispatch(bulkDeleteUsers(selectedIds));
+        if(bulkDeleteUsers.fulfilled.match(res)){
+          toast.success(`${selectedIds.length} Users Deleted Successfully`);
+          setSelectedIds([]);
+        }
+        else{
+          toast.error("Failed to delete User");
+        }
+    }catch (error: any) {
+      toast.error(error);
+    }
+  }
   return (
     <>
-    <Breadcrumb pageName="Users" /> 
+    <Breadcrumb
+        pageName="Users"
+        showActions={showBulkActions}
+        onBulkDelete={handleBulkDelete}
+    />
     <div className="space-y-4">
       {loading && <Loader />}
       {!loading && error && (
@@ -68,8 +92,11 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
           columns={["srno", "name", "email","contactNumber", "role", "status", "Action"]}
           modal_title="User"
           modal_header={[ "name", "email","contactNumber", "bio", "role", "status"]}
-          actions={["edit", "delete", "view"]}
+          actions={["edit", "delete", "view", "restore"]}
           basePath="users"
+          isCheckBox={true}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
           data={users}
           onDelete={handleDelete}
           />
