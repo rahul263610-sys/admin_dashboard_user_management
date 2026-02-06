@@ -12,8 +12,8 @@ import Button from "@/components/Button";
 
 const Settings = () => {
   const dispatch = useDispatch<AppDispatch>();
-const [previewImage, setPreviewImage] = useState<string | null>(null);
-const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
 
   const { user, loading, error } = useSelector(
@@ -87,7 +87,7 @@ const [selectedFile, setSelectedFile] = useState<File | null>(null);
       dispatch(myProfile());
     } catch (err: any) {
       toast.error(err);
-      setPasswordData({oldPassword: "", newPassword:"", confirmPassword:""})
+      setPasswordData({oldPassword: "", newPassword:"", confirmPassword:""});
     }
   };
 
@@ -191,7 +191,7 @@ const [selectedFile, setSelectedFile] = useState<File | null>(null);
                     value={formData.bio || ""}
                     placeholder="Enter Bio"
                     onChange={handleChange}
-                    />
+                  />
                 </div>
 
                 <div className="form-actions">
@@ -241,7 +241,6 @@ const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
               <div className="form-actions">
                 <Button text="Save Photo" type="button" onClick={handleSaveProfileImage} />
-
               </div>
             </div>
           </div>

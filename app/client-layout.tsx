@@ -46,12 +46,12 @@ export default function ClientLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Load auth once
+  // Load auth once
   useEffect(() => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
-  // ✅ Redirect logic (SIDE EFFECT ONLY)
+  //  Redirect logic (SIDE EFFECT ONLY)
   useEffect(() => {
     if (!authLoaded) return;
 
@@ -60,15 +60,15 @@ export default function ClientLayout({
     }
   }, [authLoaded, isAuthenticated, pathname, router]);
 
-  // ⛔ Block rendering until auth is checked
+  //  Block rendering until auth is checked
   if (!authLoaded) return null;
 
-  // ✅ Login page has no layout
+  //  Login page has no layout
   if (pathname === "/login") {
     return <>{children}</>;
   }
 
-  // ⛔ Prevent protected UI render if not logged in
+  //  Prevent protected UI render if not logged in
   if (!isAuthenticated) return null;
 
   const sidebarWidth = !isMobile ? (isSidebarExpanded ? 230 : 78) : 0;

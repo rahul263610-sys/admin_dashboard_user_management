@@ -9,6 +9,8 @@ import Loader from "@/components/Loader";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { User } from "../../components/types/user";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -35,9 +37,13 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const {token , authLoaded}= useSelector((state : RootState) => state.auth);
+    
+  if(!authLoaded){return <Loader />}
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if(!token && !authLoaded) return;
 
     const fetchStats = async () => {
       try {

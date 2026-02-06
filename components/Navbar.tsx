@@ -15,7 +15,8 @@ import { logout } from "@/redux/slices/authSlice";
 import type { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
 import {AiOutlineClose,  } from "react-icons/ai";
-import { FaHome, FaUser, FaBlog, FaChevronDown } from "react-icons/fa";
+import {FaChevronDown } from "react-icons/fa";
+import { getUserRole } from "@/auth/getUserRole";
 
 
 interface NavbarProps {
@@ -30,6 +31,7 @@ export default function Navbar({ isSidebarExpanded, setIsSidebarExpanded, isMobi
   const dispatch = useDispatch<AppDispatch>();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [openMenus, setOpenMenus] = React.useState<{ [key: string]: boolean }>({});
+  const role = getUserRole();
 
   const toggleSubmenu = (title: string) => {
   setOpenMenus((prev) => ({
@@ -96,10 +98,9 @@ export default function Navbar({ isSidebarExpanded, setIsSidebarExpanded, isMobi
         <p className="sidebar-section-title">MENU</p>
 
      <ul className="nav-menu-items">
-        {SidebarData.map((item, index) => {
+        {SidebarData.filter(item =>!item.roles || item.roles.includes(role!) ).map((item, index) => {
           const isParentExactActive = pathname === item.path;
           const isChildActive = item.children?.some((child) => pathname === child.path);
-          const isActive = isParentExactActive || isChildActive;
 
           const hasChildren = item.children && item.children.length > 0;
           const isOpen = openMenus[item.title] ?? isChildActive;
@@ -127,16 +128,16 @@ export default function Navbar({ isSidebarExpanded, setIsSidebarExpanded, isMobi
                   >
                     <span className="icon">{item.icon}</span>
                     {isSidebarExpanded && <span className="label">{item.title}</span>}
-                  {hasChildren && isSidebarExpanded && (
-                    <FaChevronDown
-                      className={`submenu-arrow ${isOpen ? "rotate" : ""}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        toggleSubmenu(item.title);
-                      }}
-                    />
-                  )}
+                    {hasChildren && isSidebarExpanded && (
+                      <FaChevronDown
+                        className={`submenu-arrow ${isOpen ? "rotate" : ""}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          toggleSubmenu(item.title);
+                        }}
+                      />
+                    )}
                   </Link>
 
                 </div>

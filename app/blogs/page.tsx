@@ -18,8 +18,15 @@ function BlogsPage() {
   const {loading, error, blogs, page: currentPage = 1, limit: limitRedux = 10, totalPages = 1,}= useSelector(
     (state : RootState) => state.blogs
   );
+  const {token , authLoaded} = useSelector((state : RootState)=> state.auth);
   const{search, filter}= useSelector((state: RootState) => state.search)
+
+  if (!authLoaded) {
+    return <Loader />;
+  }
+
    useEffect(() => {
+    if(!token && !authLoaded) return;
      dispatch(fetchAllBlogs({ page, limit, search, filter }));
    }, [dispatch, page, limit, search, filter]);
 

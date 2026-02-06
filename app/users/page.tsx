@@ -17,16 +17,22 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
   const dispatch = useDispatch<AppDispatch>();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  // const [search, setSearch] = useState("");
-  // const [filter, setFilter] = useState("");
   
   const {loading, error, users,  page: currentPage = 1, limit: limitRedux = 10, totalPages = 1,}= useSelector(
     (state : RootState) => state.users
   );
+  const {token , authLoaded} = useSelector((state : RootState)=> state.auth);
   const {search, filter} = useSelector((state : RootState)=> state.search);
   const [debouncedSearch] = useDebounce(search, 500);
 
+  if (!authLoaded) {
+    return <Loader />;
+  }
+
   useEffect(() => {
+    if(!token && !authLoaded){
+      return 
+    }
     dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter }));
   }, [dispatch, page, limit, search,debouncedSearch, filter]);
  

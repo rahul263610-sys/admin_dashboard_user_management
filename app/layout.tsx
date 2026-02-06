@@ -4,6 +4,8 @@ import "./app.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import GlobalAuthorized from "@/auth/middleware";
+import AuthInitializer from "@/auth/AuthInitializer";
 
 export default function RootLayout({
   children,
@@ -14,7 +16,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ReduxProvider>
-          
+          <AuthInitializer />
+          <GlobalAuthorized />
           <ClientLayout>{children}</ClientLayout>
           <ToastContainer
             position="top-right"
