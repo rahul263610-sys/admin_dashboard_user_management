@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { setSearch,  setFilter, resetSearch, setIsDeleted } from "@/redux/slices/searchSlice";
 import { usePathname } from "next/navigation";
 import { searchConfig } from "@/app/helper/searchConfig";
+import { filterConfig } from "@/app/helper/filterConfig";
 import DarkModeSwitcher from "./DarkModeSwitcher";
 import { getUserRole } from "@/auth/getUserRole";
 
@@ -57,6 +58,12 @@ interface HeaderProps {
   };
 
   const activeSearch = Object.keys(searchConfig).find((key) => pathname === `/${key}`);
+  const filterType = activeSearch ? searchConfig[activeSearch]?.filterType : undefined;
+
+  const handleFilterChange = (key: "filter" | "isDeleted", value: any)=>{
+    if(key==="filter") dispatch(setFilter(value));
+    if(key==="isDeleted") dispatch(setIsDeleted(value));
+  }
 
   return (
     <header className={`topbar ${isSidebarExpanded ? "expanded" : "collapsed"}`}>
@@ -72,7 +79,7 @@ interface HeaderProps {
 
           {/* SEARCH BAR */}
           <div className="header-search">
-           {activeSearch && (
+           {activeSearch && filterType && ( 
               <div className="header-search">
                 <input
                   type="text"
@@ -81,53 +88,32 @@ interface HeaderProps {
                   onChange={(e) => dispatch(setSearch(e.target.value))}
                   className="search-input"
                 />
-
-                {searchConfig[activeSearch].filterType === "users" && (
-                  <select
-                    value={filter}
-                    onChange={(e) => dispatch(setFilter(e.target.value))}
-                    className="filter-select"
-                  >
-                    <option value="">All</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                  </select>
-                )}
-                {searchConfig[activeSearch].filterType === "users" && (
-                  <select
-                     value={String(isDeleted)}
-                    onChange={(e) => dispatch(setIsDeleted(e.target.value === "true"))}
-                    className="filter-select"
-                  >
-                    <option value="false">Users</option>
-                    <option value="true">Deleted Users</option>
-                  </select>
-                )}
-
-                {searchConfig[activeSearch].filterType === "blogs" && (
-                  <select
-                    value={filter}
-                    onChange={(e) => dispatch(setFilter(e.target.value))}
-                    className="filter-select"
-                  >
-                    <option value="">All Categories</option>
-                    <option value="tech">Tech</option>
-                    <option value="lifestyle">Lifestyle</option>
-                    <option value="education">Education</option>
-                    <option value="business">Business</option>
-                    <option value="philosophy">Philosophy</option>
-                  </select>
-                )}
-                {searchConfig[activeSearch].filterType === "blogs" && role==="admin" && (
-                  <select
-                     value={String(isDeleted)}
-                    onChange={(e) => dispatch(dispatch(setIsDeleted(e.target.value === "true")))}
-                    className="filter-select"
-                  >
-                    <option value="false">Blogs</option>
-                    <option value="true">Deleted blogs</option>
-                  </select>
-                )}
+                
+                {filterConfig[filterType]?.map((item) => {
+                    if (item.role && item.role !== role) return null;
+                    return (
+                      <select
+                        key={item.key}
+                        value={item.key === "filter" ? filter : String(isDeleted)}
+                        onChange={(e) =>
+                            handleFilterChange(
+                              item.key,
+                              item.key === "isDeleted"
+                                ? e.target.value === "true"
+                                : e.target.value
+                            )
+                          }
+                        className="filter-select"
+                      >
+                        {item.options.map((opt)=>(
+                          <option key={String(opt.value)} value={String(opt.value)}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    )
+                  })
+                }
               </div>
             )}
           </div>

@@ -191,6 +191,16 @@
   color: #e2e8f0;
   border: 1px solid #475569;
 }
+.dark .app-main .delete-btn{
+  background-color: red;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+}
+.dark .app-main .update_image_btn{
+  background-color: blue;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+}
 
 /* Hover */
 .dark .app-main button:hover {

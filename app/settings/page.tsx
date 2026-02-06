@@ -226,7 +226,7 @@ const Settings = () => {
                   <p>Edit your photo</p>
                   <div className="photo-actions">
                     {previewImage ? <button className="delete-btn" type="button" onClick={handleRemoveImage}>Remove</button> : <button className="delete-btn" type="button" onClick={handleDeleteProfileImage}>Delete</button>}            
-                      <button type="button" onClick={handleSaveProfileImage}>Update</button>
+                      <button type="button" className="update_image_btn" onClick={handleSaveProfileImage}>Update</button>
                   </div>
                 </div>
               </div>
