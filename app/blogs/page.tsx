@@ -4,7 +4,7 @@ import { useEffect,useState } from "react";
 import Table from "../../components/Table";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { fetchAllBlogs,deleteBlog, bulkDeleteBlogs } from "@/redux/slices/blogSlice";
+import { fetchAllBlogs,deleteBlog, bulkActionBlogs } from "@/redux/slices/blogSlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "@/components/Loader";
@@ -30,16 +30,16 @@ function BlogsPage() {
 
    useEffect(() => {
    if (!authLoaded || !token) return;
-
+    console.log("checked for data ", authLoaded, " token",token);
      dispatch(fetchAllBlogs({ page, limit, search, filter, isDeleted }));
    }, [dispatch, page, limit, search, filter, isDeleted]);
 
-    const handleDelete = async  (id: string) => {
-      if (confirm("Are you sure you want to delete this blog ?")) {
+    const handleDelete = async  (blogId: string, action: string) => {
+      if (confirm(`Are you sure you want to ${action} this blog ?`)) {
       try{
-        const res= await dispatch(deleteBlog(id));
+        const res= await dispatch(deleteBlog({blogId, action}));
         if (deleteBlog.fulfilled.match(res)) {
-          toast.success("Blog deleted successfully");
+          toast.success(res.payload.message);
         } else {
           toast.error(res.payload || "Failed to delete blog");
         }
@@ -50,15 +50,15 @@ function BlogsPage() {
       }
     };
     
-      const handleBulkDelete = async()=>{
+      const handleBulkDelete = async(action: any)=>{
         if (selectedIds.length===0) return;
-        if(!confirm(`Are you sure you want to delete ${selectedIds.length} blogs`)){
+        if(!confirm(`Are you sure you want to ${action} ${selectedIds.length} blogs`)){
           return;
         }
         try{
-            const res = await dispatch(bulkDeleteBlogs(selectedIds));
-            if(bulkDeleteBlogs.fulfilled.match(res)){
-              toast.success(`${selectedIds.length} Blogs Deleted Successfully`);
+            const res = await dispatch(bulkActionBlogs({selectedIds,action}));
+            if(bulkActionBlogs.fulfilled.match(res)){
+              toast.success(`${selectedIds.length} Blogs ${action}d Successfully`);
               setSelectedIds([]);
             }
             else{
@@ -71,7 +71,7 @@ function BlogsPage() {
   return (
     <>
     <Breadcrumb
-      pageName="Users"
+      pageName="Blogs"
       showActions={showBulkActions}
       onBulkDelete={handleBulkDelete}
     />
@@ -84,6 +84,7 @@ function BlogsPage() {
          <>
         <Table 
           columns={["srno", "title", "content","category", "created By", "Action"]} 
+          rows={["srno", "title", "content","category", "created By", "Action"]} 
           modal_title="Blog"
           modal_header={["title", "content","category", "created By"]} 
           actions={["edit", "delete", "view", "restore"]} 
@@ -93,7 +94,7 @@ function BlogsPage() {
           setSelectedIds={setSelectedIds}
           data={blogs} 
           onDelete={handleDelete} 
-          />
+        />
         <Pagination
           page={page}
           totalPages={totalPages}

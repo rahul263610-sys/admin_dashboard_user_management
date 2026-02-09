@@ -16,7 +16,7 @@ import type { AppDispatch } from "@/redux/store";
 import { toast } from "react-toastify";
 import {AiOutlineClose,  } from "react-icons/ai";
 import {FaChevronDown } from "react-icons/fa";
-import { getUserRole } from "@/auth/getUserRole";
+import { getUserRole } from "@/lib/getUserRole";
 
 
 interface NavbarProps {

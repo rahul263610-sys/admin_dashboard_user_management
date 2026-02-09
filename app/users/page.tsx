@@ -4,7 +4,7 @@ import { useEffect,useState } from "react";
 import { useDebounce } from 'use-debounce';
 import Table from "../../components/Table";
 import Link from "next/link";
-import { fetchAllUsers, deleteUser, bulkDeleteUsers } from "@/redux/slices/userSlice";
+import { fetchAllUsers, deleteUser, bulkActionUsers } from "@/redux/slices/userSlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "@/components/Loader";
@@ -34,34 +34,35 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
     if(!token || !authLoaded){
       return 
     }
+    console.log("checked for data ", authLoaded, " token",token);
     dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter, isDeleted }));
   }, [dispatch, page, limit, search,debouncedSearch, filter, isDeleted]);
  
 
-  const handleDelete = async(id: string) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-    try{
-      const res = await dispatch(deleteUser(id));
-      if (deleteUser.fulfilled.match(res)) {
-        toast.success("User deleted successfully");
-      } else {
-        toast.error(res.payload || "Failed to delete user");
+  const handleDelete = async(userId: string, action: string) => {
+    if (confirm(`Are you sure you want to ${action} this user?`)) {
+      try{
+        const res = await dispatch(deleteUser({ userId, action }));
+        if (deleteUser.fulfilled.match(res)) {
+          toast.success(res.payload.message);
+        } else {
+          toast.error(res.payload || "Failed to delete user");
+        }
+      }catch (error: any) {
+        toast.error(error);
       }
-    }catch (error: any) {
-      toast.error(error);
     }
-  }
   };
 
-  const handleBulkDelete = async()=>{
+  const handleBulkDelete = async(action: any)=>{
     if (selectedIds.length===0) return;
-    if(!confirm(`Are you sure you want to delete ${selectedIds.length} users ?`)){
+    if(!confirm(`Are you sure you want to ${action} ${selectedIds.length} users ?`)){
       return;
     }
     try{
-        const res = await dispatch(bulkDeleteUsers(selectedIds));
-        if(bulkDeleteUsers.fulfilled.match(res)){
-          toast.success(`${selectedIds.length} Users Deleted Successfully`);
+        const res = await dispatch(bulkActionUsers({selectedIds, action}));
+        if(bulkActionUsers.fulfilled.match(res)){
+          toast.success(`${selectedIds.length} Users ${action}d Successfully`);
           setSelectedIds([]);
         }
         else{
@@ -89,7 +90,8 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
       {!loading && !error && (
         <>
         <Table
-          columns={["srno", "name", "email","contactNumber", "role", "status", "Action"]}
+          columns={["srno", "name", "email","contact Number", "role", "status", "Action"]}
+          rows={["srno", "name", "email","contactNumber", "role", "status", "Action"]}
           modal_title="User"
           modal_header={[ "name", "email","contactNumber", "bio", "role", "status"]}
           actions={["edit", "delete", "view", "restore"]}
@@ -106,7 +108,7 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
           limit={limit}
           setPage={setPage}
           setLimit={setLimit}
-          />
+        />
       </>
       )}
     </div>

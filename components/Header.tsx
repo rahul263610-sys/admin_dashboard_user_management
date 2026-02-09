@@ -12,10 +12,10 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { setSearch,  setFilter, resetSearch, setIsDeleted } from "@/redux/slices/searchSlice";
 import { usePathname } from "next/navigation";
-import { searchConfig } from "@/app/helper/searchConfig";
-import { filterConfig } from "@/app/helper/filterConfig";
+import { searchConfig } from "@/lib/config/searchConfig";
+import { filterConfig } from "@/lib/config/filterConfig";
 import DarkModeSwitcher from "./DarkModeSwitcher";
-import { getUserRole } from "@/auth/getUserRole";
+import { getUserRole } from "@/lib/getUserRole";
 
 interface HeaderProps {
   isSidebarExpanded: boolean;
@@ -126,7 +126,7 @@ interface HeaderProps {
           > {user?.avatar ? (
               <Image
                 src={user.avatar}
-                alt="Admin"
+                alt={user.name}
                 width={35}
                 height={35}
                 className="admin-avatar"
@@ -136,7 +136,6 @@ interface HeaderProps {
             )}          
             <span className="admin-name">Welcome {user?.name ? user.name : 'user'}</span>
           </div>
-
           {open && (
             <ul className="admin-dropdown">
               {HeaderData.map((item, index) => (

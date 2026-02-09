@@ -18,11 +18,16 @@ export default function AddUserPage() {
   const [role, setRole] = useState("user");
   const [contactNumber, setContactNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState("1");
   const [error, setError] = useState();
 
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+    if(password!==confirmPassword){
+      toast.error("Password and confirm password do not match");
+      return;
+    }
     try{ 
       const res= await dispatch(addUser({name, email, role, password, status, contactNumber}));
       console.log(res)
@@ -72,6 +77,14 @@ export default function AddUserPage() {
           placeholder="Enter password"
           required
           onChange={(e) => setPassword(e.target.value)}
+        />
+        <FormInput
+          label="Confirm Password"
+          type="password"
+          value={confirmPassword}
+          placeholder="Enter Confirm password"
+          required
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         <div>
           <label>Role</label>

@@ -13,18 +13,19 @@ import Checkbox from "./CheckBox";
 
 interface TableProps {
   columns: string[];
+  rows: string[];
   modal_header: string[];
   data: any[];
   actions?: ("edit" | "delete" | "view" | "restore")[];
   basePath: string;
   modal_title: string;
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string , action: string) => void;
   isCheckBox?: boolean;
   selectedIds: string[];
   setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export default function Table({ columns, actions=[], basePath, data, onDelete, modal_header=[], modal_title="", isCheckBox=false, selectedIds=[], setSelectedIds }: TableProps) {
+export default function Table({ columns,rows,  actions=[], basePath, data, onDelete, modal_header=[], modal_title="", isCheckBox=false, selectedIds=[], setSelectedIds }: TableProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -68,7 +69,7 @@ export default function Table({ columns, actions=[], basePath, data, onDelete, m
       <table>
         <thead>
           <tr>
-            {isCheckBox && user?.role==="admin"  && (<th><Checkbox checked ={allSelected} onChange={toggleAll}/></th>)}
+            {isCheckBox && user?.role==="admin"  && (<th data-column="checkbox"><Checkbox checked ={allSelected} onChange={toggleAll}/></th>)}
             {columns.map((col) => (
               <th key={col} data-column={col}>
                 {col.charAt(0).toUpperCase() + col.slice(1)}
@@ -81,7 +82,7 @@ export default function Table({ columns, actions=[], basePath, data, onDelete, m
           {data.length >0 ? data.map((row, i) => (
             <tr key={i}>
               {isCheckBox && user?.role==="admin" && (
-                <td>
+                <td data-column="checkbox">
                   <Checkbox
                     checked={selectedIds.includes(row._id)}
                     onChange={(checked) =>
@@ -90,7 +91,7 @@ export default function Table({ columns, actions=[], basePath, data, onDelete, m
                   />
                 </td>
               )}
-              {columns.map((col) => (
+              {rows.map((col) => (
                 <td key={col}  data-column={col}>
                   {col === "Action" ? (
                     <div className="action-buttons">
@@ -107,13 +108,13 @@ export default function Table({ columns, actions=[], basePath, data, onDelete, m
                       {(user?.role==="admin" || user?._id ===row?.user?._id ) && !isDeleted && actions.includes("delete") && <Button
                           icon={<FiTrash2 size={16} />}
                           variant="delete"
-                          onClick={() => onDelete?.(row._id)}
+                          onClick={() => onDelete?.(row._id, "delete")}
                           />
                       }
                       {user?.role==="admin" && isDeleted && actions.includes("restore") && <Button
                           icon={<FiRotateCcw  size={16} />}
                           variant="edit"
-                          onClick={() => onDelete?.(row._id)}
+                          onClick={() => onDelete?.(row._id, "restore")}
                           />
                       }
                   
@@ -123,8 +124,8 @@ export default function Table({ columns, actions=[], basePath, data, onDelete, m
               ))}
             </tr>
           )) :<tr>
-                <td  colSpan={columns.length + (isCheckBox ? 1 : 0)} style={{ textAlign: "center" }}>
-                  No user found
+                <td  colSpan={rows.length + (isCheckBox ? 1 : 0)} style={{ textAlign: "center" }}>
+                  No data found
                 </td>
           </tr>}
         </tbody>

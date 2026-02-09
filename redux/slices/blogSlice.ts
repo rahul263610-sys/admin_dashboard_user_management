@@ -19,6 +19,7 @@ interface blogState{
   totalPages: number;
   search: string;
   filter: string;
+  isDeleted: boolean;
 }
 
 const initialState: blogState = {
@@ -30,6 +31,7 @@ const initialState: blogState = {
   totalPages: 1,
   search: "",
   filter: "",
+  isDeleted: false,
 };
 
 export const fetchAllBlogs = createAsyncThunk<
@@ -104,18 +106,22 @@ export const addBlog= createAsyncThunk(
 )
 
 export const deleteBlog = createAsyncThunk<
-  string,
-  string,
+ {
+    message: string;
+    data: Blog;
+    success: boolean;
+  },
+  {blogId: string, action: string},
   { state: RootState; rejectValue: string }
->("blog/delete", async (blogId, { getState, rejectWithValue }) => {
+>("blog/delete", async ({blogId, action}, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
 
-    await axios.patch(`${BACKEND_URL}/api/blogs/delete/${blogId}`, {}, {
+    const res= await axios.patch(`${BACKEND_URL}/api/blogs/update/${blogId}/${action}`, {}, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    return blogId;
+    return res.data;
   } catch (error: any) {
     return rejectWithValue(
       error.response?.data?.message || "Failed to delete user"
@@ -166,17 +172,18 @@ export const updateBlog = createAsyncThunk<
   }
 });
 
-export const bulkDeleteBlogs = createAsyncThunk<
+export const bulkActionBlogs = createAsyncThunk<
 string[], 
-string[], 
+{selectedIds: string[], action: string},
 {state : RootState , rejectvalue : string}
->("user/deleteMany", async(ids, {getState, rejectWithValue })=>{
+>("user/deleteMany", async({selectedIds, action}, {getState, rejectWithValue })=>{
     try{
         const token = getState().auth.token;
         if(!token){
           return rejectWithValue("No authorization token ");
         }
-          await axios.patch(`${BACKEND_URL}/api/admin/delete/blogs`,{ids},
+        const ids= selectedIds;
+          await axios.patch(`${BACKEND_URL}/api/admin/update/blogs/${action}`,{ids},
             {
               headers : {
                 Authorization : `Bearer ${token}`,
@@ -225,7 +232,7 @@ const blogSlice = createSlice({
         })
         .addCase(deleteBlog.fulfilled, (state, action) => {
             state.blogs = state.blogs.filter(
-                (u) => u._id !== action.payload
+                (u) => u._id !== action.payload.data._id
             );
         })
         .addCase(deleteBlog.rejected, (state, action) => {
@@ -246,15 +253,15 @@ const blogSlice = createSlice({
                 };
             }
         })
-        .addCase(bulkDeleteBlogs.pending, (state) => {
+        .addCase(bulkActionBlogs.pending, (state) => {
           state.loading = true;
           state.error = null;
         })
-        .addCase(bulkDeleteBlogs.fulfilled, (state, action)=>{
+        .addCase(bulkActionBlogs.fulfilled, (state, action)=>{
           state.loading=false;
           state.blogs= state.blogs.filter((blog)=> !action.payload.includes(blog._id));
         })
-        .addCase(bulkDeleteBlogs.rejected, (state, action)=>{
+        .addCase(bulkActionBlogs.rejected, (state, action)=>{
           state.loading= false;
           state.error = action.payload as string;
         })

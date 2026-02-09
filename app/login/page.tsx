@@ -7,8 +7,12 @@ import { loginUser } from "@/redux/slices/authSlice";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation";
+import { googleLoginSuccess } from "@/redux/slices/authSlice";
+
 
 export default function AddUserPage() {
+  const searchParams= useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
@@ -37,6 +41,10 @@ export default function AddUserPage() {
       );
     }
   };
+  const handleGoogleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`;
+  };
+
 
 
   return (
@@ -89,6 +97,24 @@ export default function AddUserPage() {
           <button type="submit" className="login-button">
             Login
           </button>
+          
+         <div className="divider">
+            <span>OR</span>
+          </div>
+
+          <button
+            type="button"
+            className="google-login-button"
+            onClick={handleGoogleLogin}
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="google-icon"
+            />
+            Continue with Google
+          </button>
+
         </form>
       </div>
 

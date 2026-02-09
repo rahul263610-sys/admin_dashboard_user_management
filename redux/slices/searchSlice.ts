@@ -4,7 +4,7 @@ import { SearchState } from "@/components/types/search";
 const initialState : SearchState = {
     search : "",
     filter: "",
-    isDeleted: true,
+    isDeleted: false,
 }
 
 const searchSlice = createSlice({

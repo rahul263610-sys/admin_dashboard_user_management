@@ -75,6 +75,8 @@
       gap: 6px;  
     align-items: flex-start;
   }
+  .table-container th[data-column="checkbox"],
+  .table-container td[data-column="checkbox"],
   .table-container th[data-column="name"],
   .table-container td[data-column="name"],
   .table-container th[data-column="email"],

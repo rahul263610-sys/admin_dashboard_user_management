@@ -220,6 +220,17 @@ const authSlice = createSlice({
 
       state.authLoaded = true;
     },
+    
+    googleLoginSuccess : (state, action)=>{
+        const {token, id } = action.payload;
+        state.token= token;
+        state.userId= id;
+        state.isAuthenticated= true;
+        state.authLoaded= true;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("userId", id);
+    }
   },
 
   extraReducers: (builder) => {
@@ -308,5 +319,5 @@ const authSlice = createSlice({
     },
   });
 
-export const { logout, loadUserFromStorage } = authSlice.actions;
+export const { logout, loadUserFromStorage, googleLoginSuccess  } = authSlice.actions;
 export default authSlice.reducer;

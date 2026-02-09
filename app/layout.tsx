@@ -4,8 +4,8 @@ import "./app.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import GlobalAuthorized from "@/auth/middleware";
-import AuthInitializer from "@/auth/AuthInitializer";
+import GlobalAuthorized from "@/lib/middleware";
+import AuthInitializer from "@/lib/AuthInitializer";
 
 export default function RootLayout({
   children,

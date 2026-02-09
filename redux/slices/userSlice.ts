@@ -37,7 +37,7 @@ const initialState: UserState = {
   totalPages: 1,
   search: "",
   filter: "",
-  isDeleted: true,
+  isDeleted: false,
 };
 
 
@@ -146,17 +146,21 @@ export const updateUser = createAsyncThunk<
 });
 
 export const deleteUser = createAsyncThunk<
-  string,
-  string,
+   {
+    message: string;
+    data: User;
+    success: boolean;
+  },
+  {userId: string, action: string},
   { state: RootState; rejectValue: string }
->("user/delete", async (userId, { getState, rejectWithValue }) => {
+>("user/delete", async ({userId, action}, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
-    await axios.patch(`${BACKEND_URL}/api/admin/delete/${userId}`, {},{
+    const res= await axios.patch(`${BACKEND_URL}/api/admin/user/status/${userId}/${action}`, {},{
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    return userId;
+    return res.data;
   } catch (error: any) {
     return rejectWithValue(
       error.response?.data?.message || "Failed to delete user"
@@ -164,17 +168,18 @@ export const deleteUser = createAsyncThunk<
   }
 });
 
-export const bulkDeleteUsers = createAsyncThunk<
+export const bulkActionUsers = createAsyncThunk<
 string[], 
-string[], 
+{selectedIds: string[], action: string},
 {state : RootState , rejectvalue : string}
->("user/deleteMany", async(ids, {getState, rejectWithValue })=>{
+>("user/deleteMany", async({selectedIds, action}, {getState, rejectWithValue })=>{
     try{
         const token = getState().auth.token;
         if(!token){
           return rejectWithValue("No authorization token ");
         }
-          await axios.patch(`${BACKEND_URL}/api/admin/delete/many`,{ids},
+        const ids= selectedIds;
+          await axios.patch(`${BACKEND_URL}/api/admin/update/users/status/${action}`,{ids},
             {
               headers : {
                 Authorization : `Bearer ${token}`,
@@ -214,7 +219,6 @@ const userSlice = createSlice({
         state.error = action.payload ?? "Failed to fetch users";
       })
 
-      /* ADD */
       .addCase(addUser.fulfilled, (state, action) => {
         state.loading = false;
         state.success = action.payload.success;
@@ -223,7 +227,6 @@ const userSlice = createSlice({
         state.error = action.payload ?? "Failed to add user";
       })
 
-      /* UPDATE */
       .addCase(updateUser.fulfilled, (state, action) => {
         const updated = action.payload;
 
@@ -252,21 +255,21 @@ const userSlice = createSlice({
       /* DELETE */
       .addCase(deleteUser.fulfilled, (state, action) => {
         state.users = state.users.filter(
-          (u) => u._id !== action.payload
+          (u) => u._id !== action.payload.data._id
         );
       })
       .addCase(deleteUser.rejected, (state, action) => {
         state.error = action.payload ?? "Failed to delete user";
       })
-      .addCase(bulkDeleteUsers.pending, (state) => {
+      .addCase(bulkActionUsers.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(bulkDeleteUsers.fulfilled, (state, action)=>{
+      .addCase(bulkActionUsers.fulfilled, (state, action)=>{
         state.loading=false;
         state.users= state.users.filter((user)=> !action.payload.includes(user._id));
       })
-      .addCase(bulkDeleteUsers.rejected, (state, action)=>{
+      .addCase(bulkActionUsers.rejected, (state, action)=>{
         state.loading= false;
         state.error = action.payload as string;
       })

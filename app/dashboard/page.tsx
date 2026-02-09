@@ -11,7 +11,7 @@ import { User } from "../../components/types/user";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { getUserRole } from "@/auth/getUserRole";
+import { getUserRole } from "@/lib/getUserRole";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 

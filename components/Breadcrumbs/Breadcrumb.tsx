@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 interface BreadcrumbProps {
   pageName: string;
   showActions?: boolean;
-  onBulkDelete?: () => void;
+  onBulkDelete?: (action: string) => void;
 }
 
 const Breadcrumb = ({ pageName, showActions, onBulkDelete }: BreadcrumbProps) => {
+   const {isDeleted}= useSelector((state: RootState)=>state.search);
   return (
     <div className="breadcrumb">
       <div className="breadcrumb-left">
@@ -15,15 +18,20 @@ const Breadcrumb = ({ pageName, showActions, onBulkDelete }: BreadcrumbProps) =>
           <select
           className="filter-select"
             onChange={(e)=>{
-              if(e.target.value==="bulk-delete"){
-                onBulkDelete?.();
+              const value= e.target.value;
+              if(value==="delete" || value==="restore"){
+                onBulkDelete?.(value);
                 e.target.value="";
               }
             }}
             defaultValue=""
           >
             <option value="">Action</option>
-            <option value="bulk-delete">Bulk Delete</option>
+            {isDeleted ? (
+                <option value="restore">Restore</option>
+              ) : (
+                <option value="delete">Delete</option>
+              )}
           </select>
       }
       </div>
