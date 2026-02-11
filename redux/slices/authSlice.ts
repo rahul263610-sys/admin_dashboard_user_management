@@ -212,7 +212,7 @@ const authSlice = createSlice({
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
 
-      if (userId && token) {
+      if (token) {
         state.userId = userId;
         state.token = token;
         state.isAuthenticated = true;
@@ -227,7 +227,7 @@ const authSlice = createSlice({
         state.token = token;
         state.isAuthenticated = true;
         state.authLoaded = true;
-
+        localStorage.setItem("userId", action.payload.id);
         localStorage.setItem("token", token);
       }
   },
