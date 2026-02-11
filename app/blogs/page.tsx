@@ -22,7 +22,7 @@ function BlogsPage() {
     (state : RootState) => state.blogs
   );
   const {token , authLoaded} = useSelector((state : RootState)=> state.auth);
-  const{search, filter, isDeleted}= useSelector((state: RootState) => state.search)
+  const{search, filter}= useSelector((state: RootState) => state.search)
 
   if (!authLoaded) {
     return <Loader />;
@@ -30,9 +30,8 @@ function BlogsPage() {
 
    useEffect(() => {
    if (!authLoaded || !token) return;
-    console.log("checked for data ", authLoaded, " token",token);
-     dispatch(fetchAllBlogs({ page, limit, search, filter, isDeleted }));
-   }, [dispatch, page, limit, search, filter, isDeleted]);
+     dispatch(fetchAllBlogs({ page, limit, search, filter }));
+   }, [dispatch, page, limit, search, filter]);
 
     const handleDelete = async  (blogId: string, action: string) => {
       if (confirm(`Are you sure you want to ${action} this blog ?`)) {

@@ -1,4 +1,4 @@
-import { FaHome, FaUser, FaBlog,FaChevronDown   } from "react-icons/fa";
+import { FaHome, FaUser, FaBlog,FaChevronDown,FaMapMarkerAlt    } from "react-icons/fa";
 
 export const SidebarData = [
   {
@@ -29,5 +29,12 @@ export const SidebarData = [
       { title: "All Blogs", path: "/blogs" },
       { title: "Add Blog", path: "/blogs/add" },
     ],
+  },
+  {
+    title: "Login History",
+    path: "/loginhistory",
+    icon: <FaMapMarkerAlt  />,
+    cName: "nav-text",
+    roles: ["admin"],
   },
 ];

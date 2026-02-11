@@ -24,7 +24,6 @@ interface UserState {
   totalPages: number;
   search: string;
   filter: string;
-  isDeleted: boolean;
 }
 
 const initialState: UserState = {
@@ -37,7 +36,6 @@ const initialState: UserState = {
   totalPages: 1,
   search: "",
   filter: "",
-  isDeleted: false,
 };
 
 
@@ -50,14 +48,14 @@ export const fetchAllUsers = createAsyncThunk<
   search: string;
   filter: string;
 },
- { page: number; limit: number;search: string; filter: string; isDeleted: boolean},
+ { page: number; limit: number;search: string; filter: string;},
   { state: RootState; rejectValue: string }
->("user/fetchAllUsers", async ( { page, limit, search, filter, isDeleted }, { getState, rejectWithValue }) => {
+>("user/fetchAllUsers", async ( { page, limit, search, filter }, { getState, rejectWithValue }) => {
   try {
     const token = getState().auth.token;
     if (!token) return rejectWithValue("No authentication token");
 
-    const res = await axios.get(`${BACKEND_URL}/api/users/profiles?page=${page}&limit=${limit}&search=${search}&filter=${filter}&isDeleted=${isDeleted}`, {
+    const res = await axios.get(`${BACKEND_URL}/api/users/profiles?page=${page}&limit=${limit}&search=${search}&filter=${filter}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

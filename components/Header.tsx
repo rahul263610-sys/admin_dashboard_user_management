@@ -10,7 +10,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { myProfile, logout } from "@/redux/slices/authSlice";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { setSearch,  setFilter, resetSearch, setIsDeleted } from "@/redux/slices/searchSlice";
+import { setSearch,  setFilter, resetSearch } from "@/redux/slices/searchSlice";
 import { usePathname } from "next/navigation";
 import { searchConfig } from "@/lib/config/searchConfig";
 import { filterConfig } from "@/lib/config/filterConfig";
@@ -28,7 +28,7 @@ interface HeaderProps {
   const role= getUserRole();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { search, filter, isDeleted} = useSelector ((state: RootState)=> state.search);
+  const { search, filter} = useSelector ((state: RootState)=> state.search);
 
   useEffect(() => {
     dispatch(resetSearch());
@@ -60,9 +60,8 @@ interface HeaderProps {
   const activeSearch = Object.keys(searchConfig).find((key) => pathname === `/${key}`);
   const filterType = activeSearch ? searchConfig[activeSearch]?.filterType : undefined;
 
-  const handleFilterChange = (key: "filter" | "isDeleted", value: any)=>{
+  const handleFilterChange = (key: "filter", value: any)=>{
     if(key==="filter") dispatch(setFilter(value));
-    if(key==="isDeleted") dispatch(setIsDeleted(value));
   }
 
   return (
@@ -94,13 +93,11 @@ interface HeaderProps {
                     return (
                       <select
                         key={item.key}
-                        value={item.key === "filter" ? filter : String(isDeleted)}
+                        value={filter}
                         onChange={(e) =>
                             handleFilterChange(
                               item.key,
-                              item.key === "isDeleted"
-                                ? e.target.value === "true"
-                                : e.target.value
+                              e.target.value
                             )
                           }
                         className="filter-select"

@@ -8,7 +8,6 @@ interface BreadcrumbProps {
 }
 
 const Breadcrumb = ({ pageName, showActions, onBulkDelete }: BreadcrumbProps) => {
-   const {isDeleted}= useSelector((state: RootState)=>state.search);
   return (
     <div className="breadcrumb">
       <div className="breadcrumb-left">
@@ -27,11 +26,7 @@ const Breadcrumb = ({ pageName, showActions, onBulkDelete }: BreadcrumbProps) =>
             defaultValue=""
           >
             <option value="">Action</option>
-            {isDeleted ? (
-                <option value="restore">Restore</option>
-              ) : (
                 <option value="delete">Delete</option>
-              )}
           </select>
       }
       </div>

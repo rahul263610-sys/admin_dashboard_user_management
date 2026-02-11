@@ -1,4 +1,4 @@
-export const searchConfig: Record<string, { placeholder: string; filterType?: "users" | "blogs" }> = {
+export const searchConfig: Record<string, { placeholder: string; filterType?: "users" | "blogs" | "loginhistory"}> = {
   users: {
     placeholder: "Search users...",
     filterType: "users",
@@ -6,5 +6,9 @@ export const searchConfig: Record<string, { placeholder: string; filterType?: "u
   blogs: {
     placeholder: "Search blogs...",
     filterType: "blogs",
+  },
+  loginhistory: {
+    placeholder: "Search...",
+    filterType: "loginhistory",
   },
 };

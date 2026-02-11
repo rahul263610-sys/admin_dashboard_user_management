@@ -4,6 +4,9 @@ import userReducer from "./slices/userSlice";
 import blogReducer from "./slices/blogSlice";
 import searchReducer from "./slices/searchSlice";
 import themeReducer from "./slices/themeSlice";
+import loginHistoryReducer from "./slices/loginHistory";
+
+
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +15,7 @@ export const store = configureStore({
     blogs: blogReducer,
     search: searchReducer,
     theme: themeReducer,
-
+    loginHistory : loginHistoryReducer,
   },
 });
 

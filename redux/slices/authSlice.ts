@@ -39,7 +39,7 @@ const initialState: AuthState = {
 export const loginUser = createAsyncThunk(
   "auth/login",
   async (
-    payload: { email: string; password: string },
+    payload: { email: string; password: string;  latitude?: number | null; longitude?: number | null; device?: string; },
     { rejectWithValue }
   ) => {
     try {
@@ -221,16 +221,15 @@ const authSlice = createSlice({
       state.authLoaded = true;
     },
     
-    googleLoginSuccess : (state, action)=>{
-        const {token, id } = action.payload;
-        state.token= token;
-        state.userId= id;
-        state.isAuthenticated= true;
-        state.authLoaded= true;
+      googleLoginSuccess: (state, action) => {
+        const token = action.payload;
+
+        state.token = token;
+        state.isAuthenticated = true;
+        state.authLoaded = true;
 
         localStorage.setItem("token", token);
-        localStorage.setItem("userId", id);
-    }
+      }
   },
 
   extraReducers: (builder) => {

@@ -85,6 +85,14 @@
   .table-container td[data-column="title"],
   .table-container th[data-column="content"],
   .table-container td[data-column="content"],
+  .table-container th[data-column="username"],
+  .table-container td[data-column="username"],
+  .table-container th[data-column="last Login Date"],
+  .table-container td[data-column="loginDate"],
+  .table-container th[data-column="last Login Date"],
+  .table-container td[data-column="loginDate"],
+  .table-container th[data-column="last Login Time"],
+  .table-container td[data-column="loginTime"],
   .table-container th[data-column="Action"],
   .table-container td[data-column="Action"] {
     display: table-cell;

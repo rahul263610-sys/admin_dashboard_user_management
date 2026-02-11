@@ -19,7 +19,6 @@ interface blogState{
   totalPages: number;
   search: string;
   filter: string;
-  isDeleted: boolean;
 }
 
 const initialState: blogState = {
@@ -31,7 +30,6 @@ const initialState: blogState = {
   totalPages: 1,
   search: "",
   filter: "",
-  isDeleted: false,
 };
 
 export const fetchAllBlogs = createAsyncThunk<
@@ -43,17 +41,17 @@ export const fetchAllBlogs = createAsyncThunk<
     search: string;
     filter: string;
   },
-  { page: number; limit: number; search: string; filter: string; isDeleted: boolean },
+  { page: number; limit: number; search: string; filter: string;},
   { state: RootState; rejectValue: string }
 >(
   "blog/fetchAllBlogs",
-  async ({ page, limit, search, filter, isDeleted }, { getState, rejectWithValue }) => {
+  async ({ page, limit, search, filter }, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
       if (!token) return rejectWithValue("No authentication token");
 
       const res = await axios.get(
-        `${BACKEND_URL}/api/blogs/?page=${page}&limit=${limit}&search=${search}&filter=${filter}&isDeleted=${isDeleted}`,
+        `${BACKEND_URL}/api/blogs/?page=${page}&limit=${limit}&search=${search}&filter=${filter}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

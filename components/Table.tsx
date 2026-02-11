@@ -21,8 +21,8 @@ interface TableProps {
   modal_title: string;
   onDelete?: (id: string , action: string) => void;
   isCheckBox?: boolean;
-  selectedIds: string[];
-  setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedIds?: string[];
+  setSelectedIds?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export default function Table({ columns,rows,  actions=[], basePath, data, onDelete, modal_header=[], modal_title="", isCheckBox=false, selectedIds=[], setSelectedIds }: TableProps) {
@@ -30,7 +30,6 @@ export default function Table({ columns,rows,  actions=[], basePath, data, onDel
   const [showModal, setShowModal] = useState(false);
 
   const {user, loading, error} = useSelector((state :  RootState)=> state.auth)
-  const {isDeleted}= useSelector((state: RootState)=>state.search);
 
   const handleOpen = (user: User) => {
     setSelectedUser(user);
@@ -43,13 +42,18 @@ export default function Table({ columns,rows,  actions=[], basePath, data, onDel
   };
 
   const allSelected = data.length> 0 && selectedIds.length === data.length;
-  const toggleAll = (checked : boolean)=>{
-    setSelectedIds(checked ? data.map((d: any)=>d._id): [])
-  }
+  const toggleAll = (checked: boolean) => {
+    if (!setSelectedIds) return;
+    setSelectedIds(checked ? data.map((d: any) => d._id) : []);
+  };
 
-  const toggleOne= (id: string, checked: boolean)=>{
-    setSelectedIds(prev=>checked ? [...prev, id] :  prev.filter((x)=> x!==id));
-  }
+
+  const toggleOne = (id: string, checked: boolean) => {
+    if (!setSelectedIds) return;
+    setSelectedIds((prev) =>
+      checked ? [...prev, id] : prev.filter((x) => x !== id)
+    );
+  };
 
   const getValue = (data: User, col: string, i: number=0) => {
     switch (col) {
@@ -98,23 +102,17 @@ export default function Table({ columns,rows,  actions=[], basePath, data, onDel
                       {actions.includes("view") && (
                         <Button icon={<FiEye size={16} />} variant="view" onClick={() => handleOpen(row)} />
                       )}
-                      {(user?.role==="admin" || user?._id ===row?.user?._id ) && !isDeleted && actions.includes("edit") && <Link href={`/${basePath}/edit/${row._id}`}>
+                      {(user?.role==="admin" || user?._id ===row?.user?._id ) && actions.includes("edit") && <Link href={`/${basePath}/edit/${row._id}`}>
                         <Button
                           icon={<FiEdit2 size={16} />}
                           variant="edit"
                           />
                         </Link>
                       }
-                      {(user?.role==="admin" || user?._id ===row?.user?._id ) && !isDeleted && actions.includes("delete") && <Button
+                      {(user?.role==="admin" || user?._id ===row?.user?._id ) && actions.includes("delete") && <Button
                           icon={<FiTrash2 size={16} />}
                           variant="delete"
                           onClick={() => onDelete?.(row._id, "delete")}
-                          />
-                      }
-                      {user?.role==="admin" && isDeleted && actions.includes("restore") && <Button
-                          icon={<FiRotateCcw  size={16} />}
-                          variant="edit"
-                          onClick={() => onDelete?.(row._id, "restore")}
                           />
                       }
                   

@@ -4,12 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import FormInput from "@/components/FormInput";
 import { loginUser } from "@/redux/slices/authSlice";
+import { saveLoginHistory } from "@/redux/slices/loginHistory";
 import { RootState, AppDispatch } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useSearchParams } from "next/navigation";
 import { googleLoginSuccess } from "@/redux/slices/authSlice";
 
+interface DeviceInfo {
+  userAgent: string;
+  platform: string;
+  language: string;
+}
 
 export default function AddUserPage() {
   const searchParams= useSearchParams();
@@ -27,10 +33,93 @@ export default function AddUserPage() {
     }
   }, [isAuthenticated, router]);
 
+  useEffect(() => {
+    const token = searchParams.get("token");
+    const error = searchParams.get("error");
+
+    if (!token && !error) return;
+
+    if (error === "notallowed") {
+      toast.error("Your are not allowed to login.");
+      return;
+    }
+
+    if (token) {
+      dispatch(googleLoginSuccess(token));
+
+      const geo = localStorage.getItem("geoLocation");
+      const deviceInfo = localStorage.getItem("deviceInfo");
+
+      if (geo) {
+        const parsedGeo = JSON.parse(geo);
+
+         dispatch(
+            saveLoginHistory({
+              latitude: parsedGeo.latitude,
+              longitude: parsedGeo.longitude,
+              device: deviceInfo,
+            })
+          );
+
+        localStorage.removeItem("geoLocation");
+        localStorage.removeItem("deviceInfo");
+      }
+
+      toast.success("Logged in successfully ✅");
+      router.replace("/dashboard");
+    }
+  }, [searchParams, dispatch, router]);
+
+
+  const getGeoLocation = (): Promise<{
+    latitude: number | null;
+    longitude: number | null;
+  }> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        resolve({ latitude: null, longitude: null });
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        () => {
+          resolve({ latitude: null, longitude: null });
+        },
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    });
+  };
+
+const [device, setDevice] = useState<DeviceInfo | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setDevice({
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+      });
+    }
+  }, []);
+
+
  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+     const geo = await getGeoLocation();
     try {
-      const res = await dispatch(loginUser({ email, password })).unwrap();
+      const res = await dispatch(loginUser({ 
+        email, password,
+        latitude : geo.latitude,
+        longitude : geo.longitude,
+        device: device ? JSON.stringify(device) : undefined,
+ 
+      })).unwrap();
       if (res.success) {
         toast.success("Logged in successfully ✅");
         router.replace("/dashboard");
@@ -41,11 +130,16 @@ export default function AddUserPage() {
       );
     }
   };
-  const handleGoogleLogin = () => {
+ const handleGoogleLogin = async () => {
+    const geo = await getGeoLocation();
+
+    localStorage.setItem("geoLocation", JSON.stringify(geo));
+    if (device) {
+      localStorage.setItem("deviceInfo", JSON.stringify(device));
+    }
+
     window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`;
   };
-
-
 
   return (
   <div className="login-page">

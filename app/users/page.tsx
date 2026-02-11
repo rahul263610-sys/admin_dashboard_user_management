@@ -21,7 +21,7 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
     (state : RootState) => state.users
   );
   const {token , authLoaded} = useSelector((state : RootState)=> state.auth);
-  const {search, filter, isDeleted} = useSelector((state : RootState)=> state.search);
+  const {search, filter} = useSelector((state : RootState)=> state.search);
   const [debouncedSearch] = useDebounce(search, 500);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const showBulkActions = selectedIds.length > 0;
@@ -34,9 +34,8 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
     if(!token || !authLoaded){
       return 
     }
-    console.log("checked for data ", authLoaded, " token",token);
-    dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter, isDeleted }));
-  }, [dispatch, page, limit, search,debouncedSearch, filter, isDeleted]);
+    dispatch(fetchAllUsers({ page, limit, search: debouncedSearch, filter }));
+  }, [dispatch, page, limit, search,debouncedSearch, filter]);
  
 
   const handleDelete = async(userId: string, action: string) => {

@@ -3,7 +3,7 @@ export type filterOption = {
     value : string | boolean;
 }
 export type filterItem ={
-    key: "filter" | "isDeleted"
+    key: "filter";
     role?: "admin";
     options: filterOption[];
 }
@@ -17,13 +17,6 @@ export const filterConfig : Record<string, filterItem[]>={
                 {label: "Admin", value: "admin"},
                 {label: "User", value: "user"},
             ]
-        },
-        {
-            key : "isDeleted",
-            options : [
-                {label : "Users", value: false},
-                {label : "Deleted User", value: true},
-            ]
         }
     ],
     blogs: [
@@ -36,14 +29,6 @@ export const filterConfig : Record<string, filterItem[]>={
                 { label: "Education", value: "education" },
                 { label: "Business", value: "business" },
                 { label: "Philosophy", value: "philosophy" },
-            ]
-        },
-        {
-            key: "isDeleted",
-            role: 'admin',
-            options: [
-                {label: "Blogs", value: false},
-                {label : "Deleted Blogs", value: true},
             ]
         }
     ]
